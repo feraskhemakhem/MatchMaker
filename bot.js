@@ -12,14 +12,16 @@ const filter = (reaction, user) => {
 // actual code
 
 if (message.content === '!react') {
-	message.react(':regional_indicator_y:');
-}
+    message.react(':regional_indicator_y:');
+    const survey = message.channel.send('Please react :regional_indicator_y: if you wish to participate in the game');
 
-message.awaitReactions(filter, { max: 10, time: 60000, errors: ['time'] }) // waiting 1 minute for 10 responses
+    survey.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
 	.then(collected => console.log(collected.size))
 	.catch(collected => {
-		console.log(`After a minute, only ${collected.size} out of 10 reacted.`);
+		console.log(`After a minute, only ${collected.size} out of 1 reacted.`);
 	});
+}
+
 
 
 
