@@ -5,9 +5,9 @@ const Discord = require('discord.js');
 
 const client = new Discord.Client();
 
-const filter = (reaction, user) => {
-	return reaction.emoji.name === ':regional_indicator_y' && user.id === message.author.id;
-};
+// const filter = (reaction, user) => {
+// 	return reaction.emoji.name === ':regional_indicator_y:' && user.id === message.author.id;
+// };
  
 // actual code
 
