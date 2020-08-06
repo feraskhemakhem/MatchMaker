@@ -13,7 +13,7 @@ const client = new Discord.Client();
 
 client.on('message', message => {
     if (message.content === '!react') {
-        message.react('regional_indicator_y');
+        message.react('🇾');
         const survey = message.channel.send('Please react :regional_indicator_y: if you wish to participate in the game');
         // survey.react(':regional_indicator_y:');
 
