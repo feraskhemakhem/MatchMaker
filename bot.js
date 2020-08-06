@@ -14,8 +14,8 @@ const filter = (reaction, user) => {
 client.on('message', message => {
     if (message.content === '!react') {
         // message.react('👍');
-        var survey = message.channel.send('Please react :regional_indicator_y: if you wish to participate in the game');
-        survey.react('🇾');
+        var survey = message.channel.send('Please react :regional_indicator_y: if you wish to participate in the game')
+            .then(reply => reply.react('🇾'));
 
         // survey.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
         // .then(message.channel.send('Max capacity reached. Developing teams.'))
