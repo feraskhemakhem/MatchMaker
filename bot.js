@@ -7,7 +7,7 @@ const { debug } = require('request');
 const client = new Discord.Client();
 
 const filter = (reaction, user) => {
-	return reaction.emoji.name === '🇾' && user.id === message.author.id;
+	return reaction.emoji.name === '✅' && user.id === message.author.id;
 };
  
 // actual code
@@ -18,17 +18,19 @@ client.on('message', async message => {
 
         // using await (https://discordjs.guide/additional-info/async-await.html#execution-with-discord-js-code)
         try {
-            const reply = await message.channel.send('Please react :regional_indicator_y: if you wish to participate in the game');
-            await reply.react('🇾');
+            const reply = await message.channel.send('Please react :white_check_mark: if you wish to participate in the game');
+            await reply.react('✅');
+
+
+            // structure inspired by https://stackoverflow.com/questions/50058056/how-to-use-awaitreactions-in-guildmemberadd
+            reply.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
+                .then(message.channel.send('Max capacity reached. Developing teams.'))
+                .catch(collected => {
+            	console.log(`After a minute, only ${collected.size} out of 1 reacted.`);
+            });
         } catch (error) {
             debug.log('error replying and reacting');
         }
-
-        // survey.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
-        // .then(message.channel.send('Max capacity reached. Developing teams.'))
-        // .catch(collected => {
-        // 	console.log(`After a minute, only ${collected.size} out of 1 reacted.`);
-        // });
     }
 });
 
