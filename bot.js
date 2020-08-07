@@ -23,7 +23,7 @@ client.on('message', async message => {
 
 
             // structure inspired by https://stackoverflow.com/questions/50058056/how-to-use-awaitreactions-in-guildmemberadd
-            reply.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
+            reply.awaitReactions(filter, { max: 1, time: 10, errors: ['time'] }) // waiting 1 minute for 1 responses
                 .then(message.channel.send('Max capacity reached. Developing teams.'))
                 .catch(collected => {
             	console.log(`After a minute, only ${collected.size} out of 1 reacted.`);
