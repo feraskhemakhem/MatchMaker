@@ -12,7 +12,7 @@ const filter = (reaction, user) => {
  
 // actual code
 
-client.on('message', message => {
+client.on('message', async message => {
     if (message.content === '!react') {
         // message.react('👍');
 
