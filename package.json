@@ -1,7 +1,7 @@
 {
   "name": "MatchMaker",
   "description": "Bot that forms teams randomly or by ELO",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"

@@ -1,4 +1,6 @@
-// IDEA:  add functionality to read names from a discord voice chat instead of waiting for reactions
+// IDEAs:  add functionality to read names from a discord voice chat instead of waiting for reactions
+
+
 // consts
 
 const Discord = require('discord.js');
@@ -25,7 +27,7 @@ client.on('message', async message => {
             reply.awaitReactions(filter, { max: 2, time: 10000, errors: ['time'] }) // waiting 1 minute for 1 responses
                 .then(message.channel.send('Max capacity reached. Developing teams.'))
                 .catch(collected => {
-            	console.log('After a minute, only ${collected.size} out of 1 reacted.');
+            	console.log(`After a minute, only ${collected.size} out of 1 reacted.`);
             });
         } catch (error) {
             console.log('error replying and reacting');
