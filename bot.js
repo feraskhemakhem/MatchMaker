@@ -1,15 +1,28 @@
 // IDEAs:  add functionality to read names from a discord voice chat instead of waiting for reactions
 
+// includes
+import {findTeams} from './findteams.js';
 
 // consts
-
 const Discord = require('discord.js');
 const { debug } = require('request');
 
 const client = new Discord.Client();
- 
-// actual code
 
+// temp const for testing
+const random_dict = {
+    'jeff' : 9,
+    'maddie' : 3,
+    'cherry' : 9,
+    'jesus' : 7,
+    'damon' : 1,
+    'max' : 15,
+    'andrew' : 6,
+    'tammi' : 7,
+};
+
+ 
+// constantly running callback for when a message is sent
 client.on('message', async message => {
     if (message.content.startsWith('!match')) {
 
@@ -18,10 +31,13 @@ client.on('message', async message => {
         var num_players = parseInt(message.content.match(digits));
 
         // small error checking for number of players
-        if (num_players < 0) {
+        if (num_players < 0 || isNaN(num_players)) {
             await message.channel.send('Only non-negative numbers allowed');
             return;
         }
+        console.log(num_players);
+
+        let ids = [];
 
         // using await (https://discordjs.guide/additional-info/async-await.html#execution-with-discord-js-code)
         try {
@@ -34,13 +50,34 @@ client.on('message', async message => {
 
             // structure inspired by https://stackoverflow.com/questions/50058056/how-to-use-awaitreactions-in-guildmemberadd
             reply.awaitReactions(filter, { max: num_players, time: 10000, errors: ['time'] }) // waiting 1 minute for 1 responses
-                .then(collected => console.log(collected.size))//message.channel.send('x.Max capacity reached. Developing teams.'))
-                .catch(collected => {
-            	console.log('x.After a minute, only ${collected.size} out of 2 reacted.');
+                .then(collected => {
+                    message.channel.send('x.Responses recorded...');
+
+                    // extract IDs of reactors
+                    ids = Array.from(collected.values());
+                    ids = Array.from(ids[0].users.keys());
+
+                    message.channel.send('x.Polling is complete. Making teams...');
+
+                    // make the teams
+                    // findTeams(ids, random_dict);
+
+                    // print ids at discord users
+                    // message.channel.send('x.Team1:');
+
+                })
+                .catch(collected => { 
+            	console.log(`x.After a minute, only ${collected.size} out of ${num_players} reacted.`);
             });
         } catch (error) {
             console.log('x.error replying and reacting');
         }
+
+
+        // look up elos based on ids and store in temp array for calculation
+        // for now, just hard code I guess?
+        
+
 
     }
     // set the elo of yourself
@@ -94,7 +131,7 @@ client.on('message', async message => {
                 score = -10;
                 break;
             default: // if we get this far, there's an error
-                await message.channel.send('Only valid inputs are allowed');
+                await message.channel.send('Only valid ranks are allowed');
                 return;
         }
 
@@ -102,8 +139,17 @@ client.on('message', async message => {
         score *= 3;
         score += elo_number;
 
+        // TODO: add entry with user key and score to server
+
+        // send message to confirm score value
         await message.channel.send('your score is ' + score);
     }
+
+    else if (message.content.startsWith('!test')) {
+        findTeams();
+
+    }
+
 });
 
 
@@ -113,4 +159,4 @@ client.on('message', async message => {
 
 // THIS  MUST  BE  THIS  WAY
 
-client.login(process.env.BOT_TOKEN);//BOT_TOKEN is the Client Secret
+client.login(process.env.BOT_TOKEN); //BOT_TOKEN is the Client Secret
