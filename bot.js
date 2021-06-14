@@ -1,10 +1,12 @@
-// IDEAs:  add functionality to read names from a discord voice chat instead of waiting for reactions
+// IDEAs:  - add functionality to read names from a discord voice chat instead of waiting for reactions
+//         - add option to move people to given channels (automatically move to Val and Val2)
+
 
 // includes
-import {findTeams} from './findteams.js';
 
 // consts
 const Discord = require('discord.js');
+const commands = require('./commands.js');
 const { debug } = require('request');
 
 const client = new Discord.Client();
@@ -145,9 +147,11 @@ client.on('message', async message => {
         await message.channel.send('your score is ' + score);
     }
 
-    else if (message.content.startsWith('!test')) {
-        findTeams();
-
+    else if (message.content.startsWith('!reroll')) { // in case we don't like the teams, we can reroll
+        let are_teams_made = commands.makeTeams(random_dict, message);
+        if (!are_teams_made) { // if teams aren't made, let them know
+            message.channel.send('Unable to make teams with these players. Sorry :(');
+        }
     }
 
 });
