@@ -8,7 +8,6 @@
 const Discord = require('discord.js');
 const commands = require('./commands.js');
 const { debug } = require('request');
-
 const client = new Discord.Client();
 
 // temp const for testing
@@ -25,6 +24,8 @@ const random_dict = {
     '721167637006123088' : 3,
 };
 
+// cached last players (only caches 1 team across all servers - would have to add to database for multiserver use)
+let cached_team = {};
  
 // constantly running callback for when a message is sent
 client.on('message', async message => {
@@ -37,6 +38,7 @@ client.on('message', async message => {
         // small error checking for number of players
         if (isNaN(num_players)) {
             await message.channel.send('Please follow the format: \"!match <number of players>\"');
+            return;
         }
         else if (num_players < 0) {
             await message.channel.send('Only non-negative numbers allowed');
@@ -61,15 +63,13 @@ client.on('message', async message => {
                     message.channel.send('Responses recorded...');
 
                     // extract IDs of reactors
-                    // EACH COLLECTED CONSISTS OF THE FOLLOWING:
                     // KEY IS THE EMOJI
-                    // VALUE IS THE FOLLOWING: MESSAGEID (ID STRING), USERS (ID STRINGS), COUNT (# REACTIONS), ME (BOOL)
                     // https://discord.js.org/#/docs/main/stable/class/MessageReaction
                     // https://discord.js.org/#/docs/main/stable/class/ReactionUserManager
                     let temp_count = collected.first().count;
                     ids = Array.from(collected.first().users.cache.firstKey(temp_count)); // apparently i need all of this for ids
 
-                    // if bot's ID exists in list, remove
+                    // if bot's ID exists in list, remove (commented out when debugging)
                     let index_of_my_id;
                     if ((index_of_my_id = ids.indexOf(client.user.id)) !== -1) {
                         ids.splice(index_of_my_id, 1);
@@ -90,20 +90,21 @@ client.on('message', async message => {
 
 
                     // make the teams
+                    let are_teams_made = commands.makeTeams(elos, message, client);
+                    if (!are_teams_made) { // if teams aren't made, let them know
+                        message.channel.send('Unable to make teams with these players. Sorry :(');
+                    }
+
+                    // cache last team used
+                    cached_team = elos;
 
                 })
                 .catch(collected => { 
-            	console.log(`Collected is ${JSON.stringify(collected)}. After a minute, only ${collected.size} out of ${num_players} reacted.`);
+            	console.log(`Collected is ${collected}. After a minute, only ${collected.size} out of ${num_players} reacted.`);
             });
         } catch (error) {
             console.log('error replying and reacting');
-        }
-
-
-        // look up elos based on ids and store in temp array for calculation
-        // for now, just hard code I guess?
-        
-
+        }        
 
     }
     // set the elo of yourself
@@ -181,9 +182,14 @@ client.on('message', async message => {
     }
 
     else if (message.content.startsWith('!reroll')) { // in case we don't like the teams, we can reroll
-        let are_teams_made = commands.makeTeams(random_dict, message);
+        if (Object.entries(cached_team).length === 0) { // check if cached team is empty
+            message.channel.send('No player lists cached. Please use \"!match <player count>" instead');
+            return;
+        }
+        let are_teams_made = commands.makeTeams(cached_team, message, client);
         if (!are_teams_made) { // if teams aren't made, let them know
             message.channel.send('Unable to make teams with these players. Sorry :(');
+            return;
         }
     }
 
@@ -195,5 +201,4 @@ client.on('message', async message => {
  
 
 // THIS  MUST  BE  THIS  WAY
-
 client.login(process.env.BOT_TOKEN); //BOT_TOKEN is the Client Secret
