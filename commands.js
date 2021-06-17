@@ -1,11 +1,14 @@
-https://stackoverflow.com/questions/50426635/exporting-importing-in-node-js-discord-js
+// https://stackoverflow.com/questions/50426635/exporting-importing-in-node-js-discord-js
+
+
+// just some puns
+const puns = ['It was a match made in heaven', 'we make matches, not lighters', 'the match of the century'];
 
 // function for calculating the optimal teams
 // parameters: objects containing pairs of player ids and ranks (strings : Integers), and message reference for replying
 // output: ids of players on team 1, and team 2
-
 module.exports = {  
-    makeTeams: function(player_data, message) {
+    makeTeams: function(player_data, message, client) {
 
         // step 0: create initial team lists
         // NOTE: ASSUMING ONLY 2 TEAMS
@@ -129,25 +132,59 @@ module.exports = {
         // step 5: determine advantage score based on team score and report
         let team_diff = curr_team_scores[0] - curr_team_scores[1];
         let team_advantage = 2; // default that team 2 has advantage
+        let team_ad_string = '';
         if (team_diff === 0) { // if no diff, equal
-            message.channel.send('TEAMS ARE EQUAL POG');
-            return true;
+            team_ad_string = 'Teams are perfectly balanced, as all things should be';
         }
         else if (team_diff > 0) { // if difference is negative, first team has advantage
             team_advantage = 1;
         }
         // print warnings based on how large the team diff is
         if (team_diff <= 4 && team_diff >= -4) {
-            message.channel.send(`Warning: Team ${team_advantage} has a slight advantage`);
+            // message.channel.send(`Warning: Team ${team_advantage} has a slight advantage`);
+            team_ad_string = `Team ${team_advantage} has a slight advantage`;
         }
         else {
-            message.channel.send(`Warning: Team ${team_advantage} has a large advantage`);
+            // message.channel.send(`Warning: Team ${team_advantage} has a large advantage`);
+            team_ad_string = `Team ${team_advantage} has a large advantage`;
         }
 
-        // print values for testing
-        message.channel.send(`Team 1\'s ${t1.length} players consists of: ${t1}`);
-        message.channel.send(`Team 2\'s first ${t2.length} players consists of: ${t2}`);
+        // collect users into string for printing
+        // https://stackoverflow.com/questions/63069415/discord-js-how-to-get-a-discord-username-from-a-user-id
+        let t1_string = '';
+        t1.forEach(element => {
+            let person = client.users.cache.get(element).username;
+            console.log(`person is: ${person}`);
+            t1_string = t1_string + '\n' + person;
+        });
 
-        return true;
+        let t2_string = '';
+        t2.forEach(element => {
+            let person = client.users.cache.get(element).username;
+            console.log(`person is: ${person}`);
+            t2_string = t2_string + '\n' + person;
+        });
+
+        // print teams in an embedded message
+        // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
+        message.channel.send({embed: {
+                color: '#ffb7c5', // cherry blossom hex
+                title: 'Teams:', // title could be better, but this is it for now...
+                fields: [ // actual team info
+                    {name: 'Team 1', value: `${t1_string}`, inline: true},
+                    {name: '\u200B', value: '\u200B', inline: true},
+                    {name: 'Team 2', value: `${t2_string}`, inline: true},
+                    {name: '\u200B', value: '\u200B'},
+                    {name: 'Advantage', value: team_ad_string},
+                    // {name: '\u200B', value: '\u200B'}
+                ],
+                timestamp: new Date(), // to distinguish between matchings
+                footer: { // add a little pun at the bottom
+                    text: puns[Math.floor(Math.random() * puns.length)]
+                }
+            }
+        });
+
+        return true; // if you've made it this far, you're either really sneaky or just a valid entry
     }
 };
