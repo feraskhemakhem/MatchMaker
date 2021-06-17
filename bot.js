@@ -2,7 +2,11 @@
 //         - add option to move people to given channels (automatically move to Val and Val2)
 //         - make setting elo reaction-based
 
-// includes
+// Next:
+// - (DONE) Tweak the UI for displaying (esp advantage). it doesnt feel full enough... find more stuff to put idk
+// - (DONE) Dont let people make matches with 1 or less people (eventually i guess?)
+// - Look into SQL Lite and see if it's worth it for this scope
+// - Look into making elo-setting reaction-based
 
 // consts
 const Discord = require('discord.js');
@@ -11,18 +15,7 @@ const { debug } = require('request');
 const client = new Discord.Client();
 
 // temp const for testing
-const random_dict = {
-    'jeff' : 9,
-    'maddie' : 3,
-    'cherry' : 9,
-    'jesus' : 7,
-    'damon' : 1,
-    'max' : 15,
-    'andrew' : 6,
-    'tammi' : 7,
-    '364583155623264256' : 9,
-    '721167637006123088' : 3,
-};
+const random_dict = {};
 
 // cached last players (only caches 1 team across all servers - would have to add to database for multiserver use)
 let cached_team = {};
@@ -40,8 +33,8 @@ client.on('message', async message => {
             await message.channel.send('Please follow the format: \"!match <number of players>\"');
             return;
         }
-        else if (num_players < 0) {
-            await message.channel.send('Only non-negative numbers allowed');
+        else if (num_players < 2) {
+            await message.channel.send('At least 2 people required to make a match');
             return;
         }
 
@@ -60,7 +53,7 @@ client.on('message', async message => {
             // structure inspired by https://stackoverflow.com/questions/50058056/how-to-use-awaitreactions-in-guildmemberadd
             reply.awaitReactions(filter, { max: num_players, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
                 .then(collected => {
-                    message.channel.send('Responses recorded...');
+                    console.log('Responses recorded...');
 
                     // extract IDs of reactors
                     // KEY IS THE EMOJI
@@ -75,7 +68,7 @@ client.on('message', async message => {
                         ids.splice(index_of_my_id, 1);
                     }
 
-                    message.channel.send('Polling is complete. Making teams...');
+                    message.channel.send('Polling has closed. Making teams...');
 
 
                     // find these ids in the list and make a dictionary of their elos
@@ -86,7 +79,7 @@ client.on('message', async message => {
                         }
                     });
 
-                    message.channel.send(`elos are: ${JSON.stringify(elos)}`);
+                    console.log(`elos are: ${JSON.stringify(elos)}`);
 
 
                     // make the teams
@@ -100,6 +93,7 @@ client.on('message', async message => {
 
                 })
                 .catch(collected => { 
+                message.channel.send('Polling has closed. Not enough people have chosen to participate.');
             	console.log(`Collected is ${collected}. After a minute, only ${collected.size} out of ${num_players} reacted.`);
             });
         } catch (error) {
