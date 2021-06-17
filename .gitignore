@@ -283,4 +283,7 @@ dist/
 tmp/
 temp/
 
+# my own little file :)
+secret.txt
+
 # End of https://www.toptal.com/developers/gitignore/api/node
