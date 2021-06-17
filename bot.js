@@ -186,6 +186,10 @@ client.on('message', async message => {
             return;
         }
     }
+    
+    else if (message.content === '!v') {
+        message.channel.send('MatchMaker v1.0');
+    }
 
 });
 
