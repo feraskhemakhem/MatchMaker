@@ -1,13 +1,26 @@
 {
-  "name": "MatchMaker",
-  "description": "Bot that forms teams randomly or by ELO",
+  "name": "matchmaker",
   "version": "1.0.0",
+  "description": "Arranges teams for custom games based on elo",
   "main": "bot.js",
   "scripts": {
-    "start": "node bot.js"
+    "test": "node bot.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feraskhemakhem/MatchMaker.git"
+  },
+  "keywords": [
+    "Discord",
+    "Matchmaking"
+  ],
+  "author": "cherry_blossom",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/feraskhemakhem/MatchMaker/issues"
+  },
+  "homepage": "https://github.com/feraskhemakhem/MatchMaker#readme",
   "dependencies": {
-    "discord.js": "^12.5.3",
-    "request": "2.81.0"
+    "discord.js": "^12.5.3"
   }
 }

@@ -7,11 +7,12 @@
 // - (DONE) Dont let people make matches with 1 or less people (eventually i guess?)
 // - Look into SQL Lite and see if it's worth it for this scope
 // - Look into making elo-setting reaction-based
+// - Alter team-making algorithm to treat unrated as the average
+// - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
 
 // consts
 const Discord = require('discord.js');
 const commands = require('./commands.js');
-const { debug } = require('request');
 const client = new Discord.Client();
 
 // temp const for testing
@@ -114,6 +115,10 @@ client.on('message', async message => {
         // edge case for no subrank number
         if (elo === 'radiant') {
             elo_bracket = 'radiant';
+            elo_number = 0;
+        }
+        else if (elo === 'unranked') {
+            elo_bracket = 'unranked';
             elo_number = 0;
         }
         // small error checking
