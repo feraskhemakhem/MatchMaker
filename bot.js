@@ -13,7 +13,11 @@
 // consts
 const Discord = require('discord.js');
 const commands = require('./commands.js');
+const dotenv = require('dotenv');
 const client = new Discord.Client();
+
+//https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
+dotenv.config();
 
 // temp const for testing
 const random_dict = {};
