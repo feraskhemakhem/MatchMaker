@@ -8,6 +8,26 @@ const puns = ['It was a match made in heaven', 'we make matches, not lighters', 
 // parameters: objects containing pairs of player ids and ranks (strings : Integers), and message reference for replying
 // output: ids of players on team 1, and team 2
 module.exports = {  
+    printTeams: function(message, t1_string, t2_string, team_ad_string) {
+        // print teams in an embedded message
+        // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
+        message.channel.send({embed: {
+                color: '#ffb7c5', // cherry blossom hex
+                title: 'Teams:', // title could be better, but this is it for now...
+                fields: [ // actual team info
+                    {name: 'Team 1', value: `${t1_string}`, inline: true},
+                    {name: '\u200B', value: '\u200B', inline: true},
+                    {name: 'Team 2', value: `${t2_string}`, inline: true},
+                    {name: '\u200B', value: '\u200B'},
+                    {name: 'Advantage', value: team_ad_string},
+                ],
+                timestamp: new Date(), // to distinguish between matchings
+                footer: { // add a little pun at the bottom
+                    text: puns[Math.floor(Math.random() * puns.length)]
+                }
+            }
+        });
+    },
     makeTeams: function(player_data, message, client) {
 
         // step 0: create initial team lists
@@ -24,11 +44,25 @@ module.exports = {
         // i. calculate average player score ("aps")
         let aps = 0;
         for (let key in player_data) {
-            aps = aps + player_data[key];
+            if (player_data[key] < 0) { // if unranked, disclude from average and give its value the average
+                num_players = num_players - 1;
+            }
+            else {
+                aps = aps + player_data[key];
+            }
         }
         aps = aps / num_players;
+        num_players = Object.keys(player_data).length; // set num players back to what it was before
+
+        // set unranked players' values to average (aps)
+        for (let key in player_data) {
+            if (player_data[key] < 0) {
+                player_data[key] = aps;
+            }
+        }
 
         console.log(`aps is ${aps}`);
+        console.log(`players are ${JSON.stringify(player_data)}`);
 
         // ii. calculate stdev
         let stdev = 0;
@@ -167,23 +201,24 @@ module.exports = {
 
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
-        message.channel.send({embed: {
-                color: '#ffb7c5', // cherry blossom hex
-                title: 'Teams:', // title could be better, but this is it for now...
-                fields: [ // actual team info
-                    {name: 'Team 1', value: `${t1_string}`, inline: true},
-                    {name: '\u200B', value: '\u200B', inline: true},
-                    {name: 'Team 2', value: `${t2_string}`, inline: true},
-                    {name: '\u200B', value: '\u200B'},
-                    {name: 'Advantage', value: team_ad_string},
-                    // {name: '\u200B', value: '\u200B'}
-                ],
-                timestamp: new Date(), // to distinguish between matchings
-                footer: { // add a little pun at the bottom
-                    text: puns[Math.floor(Math.random() * puns.length)]
-                }
-            }
-        });
+        // message.channel.send({embed: {
+        //         color: '#ffb7c5', // cherry blossom hex
+        //         title: 'Teams:', // title could be better, but this is it for now...
+        //         fields: [ // actual team info
+        //             {name: 'Team 1', value: `${t1_string}`, inline: true},
+        //             {name: '\u200B', value: '\u200B', inline: true},
+        //             {name: 'Team 2', value: `${t2_string}`, inline: true},
+        //             {name: '\u200B', value: '\u200B'},
+        //             {name: 'Advantage', value: team_ad_string},
+        //             // {name: '\u200B', value: '\u200B'}
+        //         ],
+        //         timestamp: new Date(), // to distinguish between matchings
+        //         footer: { // add a little pun at the bottom
+        //             text: puns[Math.floor(Math.random() * puns.length)]
+        //         }
+        //     }
+        // });
+        this.printTeams(message, t1_string, t2_string, team_ad_string);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
     }
