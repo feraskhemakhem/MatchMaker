@@ -9,6 +9,7 @@
 // - Look into making elo-setting reaction-based
 // - (DONE) Alter team-making algorithm to treat unrated as the average
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
+// - Add option in setup to check tags instead of checking server
 
 // consts
 const Discord = require('discord.js');
@@ -26,6 +27,11 @@ const random_dict = {};
 let cached_players = {};
 
 const debug = true; // BOOLEAN FOR DEBUGGING :DD
+
+// ON CREATION, PUT A MESSAGE IN THE SERVER ASKING FOR RANKS
+client.on('ready', () => {
+    console.log(`I'm ready!`);
+});
  
 // constantly running callback for when a message is sent
 client.on('message', async message => {
@@ -118,71 +124,12 @@ client.on('message', async message => {
     else if (message.content.startsWith('!setelo')) {
 
         console.log('registering new elo');
-        // extract relevant info from string
-        let elo = message.content.substring(message.content.indexOf(' ') + 1);
-        let elo_bracket = elo.substring(0, elo.indexOf(' '));
-        let elo_number = parseInt(elo.substring(elo.indexOf(' ') + 1)) || -1;
-
-        // edge case for no subrank number
-        if (elo === 'radiant') {
-            elo_bracket = 'radiant';
-            elo_number = 0;
-        }
-        else if (elo === 'unranked') {
-            elo_bracket = 'unranked';
-            elo_number = 0;
-        }
-        // small error checking
-        else if (elo === -1) {
-            await message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>');
+        
+        // calculate the score based on the elo provided
+        let score;
+        if ((score = commands.eloToScore(message)) === -1) { // if -1, then error, so return
             return;
         }
-        // in case number is out of range
-        else if (elo_number < 0 || elo_number > 3) {
-            await message.channel.send('Please enter a valid subrank number');
-            return;
-        }
-
-        let score = 0;
-        // set initial score based on bracket
-        // NOTE: probably cleaner with an enum equivilent
-        switch(elo_bracket) {
-            case "iron":
-                score = 0;
-                break;
-            case "bronze":
-                score = 1;
-                break;
-            case "silver":
-                score = 2;
-                break;
-            case "gold":
-                score = 3;
-                break;
-            case "platinum":
-            case "plat":
-                score = 4;
-                break;
-            case "diamond":
-                score = 5;
-                break;
-            case "immortal":
-                score = 6;
-                break;
-            case "radiant":
-                score = 7;
-                break;
-            case "unranked": // unranked is negative as to ignore the rank in the future
-                score = -10;
-                break;
-            default: // if we get this far, there's an error
-                await message.channel.send('Only valid ranks are allowed');
-                return;
-        }
-
-        // now consider number for elo
-        score *= 3;
-        score += elo_number;
 
         // TODO: add entry with user key and score to server
         random_dict[message.author.id] = score;
@@ -202,19 +149,19 @@ client.on('message', async message => {
         }
     }
     
-    else if (message.content === '!v') {
-        message.channel.send('MatchMaker v1.1');
+    else if (message.content === '!v') { // prints the version of matchmaker
+        message.channel.send('MatchMaker v1.2');
     }
 
-    else if (message.content === '!ping') {
+    else if (message.content === '!ping') { // just something for testing
         commands.printTeams(message, `t1`, `t2`, `no ad`);
     }
 
     else if (message.content === '!myelo') {
-        if (random_dict[message.author.id]) {
+        if (random_dict[message.author.id]) { // if rank exists, print it
             message.channel.send(`Your elo is ${random_dict[message.author.id]}`);
         }
-        else {
+        else { // otherwise indicate that rank doesnt exist
             message.channel.send(`No elo is recorded under your username`);
         }
     }

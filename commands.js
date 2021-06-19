@@ -8,6 +8,76 @@ const puns = ['It was a match made in heaven', 'we make matches, not lighters', 
 // parameters: objects containing pairs of player ids and ranks (strings : Integers), and message reference for replying
 // output: ids of players on team 1, and team 2
 module.exports = {  
+    eloToScore: function(message) {
+        // extract relevant info from string
+        let elo = message.content.substring(message.content.indexOf(' ') + 1);
+        let elo_bracket = elo.substring(0, elo.indexOf(' '));
+        let elo_number = parseInt(elo.substring(elo.indexOf(' ') + 1)) || -1;
+
+        // edge case for no subrank number
+        if (elo === 'radiant') {
+            elo_bracket = 'radiant';
+            elo_number = 0;
+        }
+        else if (elo === 'unranked') {
+            elo_bracket = 'unranked';
+            elo_number = 0;
+        }
+        // small error checking
+        else if (elo === -1) { // this occurs when elo isnt given
+            await message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>');
+            return -1;
+        }
+        // in case number is out of range
+        else if (elo_number < 0 || elo_number > 3) {
+            await message.channel.send('Please enter a valid subrank number');
+            return -1;
+        }
+
+        let score = 0;
+        // set initial score based on bracket
+        // NOTE: probably cleaner with an enum equivilent
+        switch(elo_bracket) {
+            case "iron":
+                score = 0;
+                break;
+            case "bronze":
+                score = 1;
+                break;
+            case "silver":
+                score = 2;
+                break;
+            case "gold":
+                score = 3;
+                break;
+            case "platinum":
+            case "plat":
+                score = 4;
+                break;
+            case "diamond":
+                score = 5;
+                break;
+            case "immortal":
+                score = 6;
+                break;
+            case "radiant":
+                score = 7;
+                break;
+            case "unranked": // unranked is negative as to ignore the rank in the future
+                score = -10;
+                break;
+            default: // if we get this far, there's an error
+                await message.channel.send('Only valid ranks are allowed');
+                return -1;
+        }
+
+        // now consider number for elo
+        score *= 3;
+        score += elo_number;
+
+        // return final score
+        return score;
+    },
     printTeams: function(message, t1_string, t2_string, team_ad_string) {
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
@@ -199,25 +269,7 @@ module.exports = {
             t2_string = t2_string + '\n' + person;
         });
 
-        // print teams in an embedded message
-        // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
-        // message.channel.send({embed: {
-        //         color: '#ffb7c5', // cherry blossom hex
-        //         title: 'Teams:', // title could be better, but this is it for now...
-        //         fields: [ // actual team info
-        //             {name: 'Team 1', value: `${t1_string}`, inline: true},
-        //             {name: '\u200B', value: '\u200B', inline: true},
-        //             {name: 'Team 2', value: `${t2_string}`, inline: true},
-        //             {name: '\u200B', value: '\u200B'},
-        //             {name: 'Advantage', value: team_ad_string},
-        //             // {name: '\u200B', value: '\u200B'}
-        //         ],
-        //         timestamp: new Date(), // to distinguish between matchings
-        //         footer: { // add a little pun at the bottom
-        //             text: puns[Math.floor(Math.random() * puns.length)]
-        //         }
-        //     }
-        // });
+        // print results
         this.printTeams(message, t1_string, t2_string, team_ad_string);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
