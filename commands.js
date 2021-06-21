@@ -7,7 +7,59 @@ const puns = ['It was a match made in heaven', 'we make matches, not lighters', 
 // function for calculating the optimal teams
 // parameters: objects containing pairs of player ids and ranks (strings : Integers), and message reference for replying
 // output: ids of players on team 1, and team 2
-module.exports = {  
+module.exports = { 
+    setup: function(message, defaultText) {
+        // some string parsing for reading the message content
+        let first_space;
+        if ((first_space = message.content.indexOf(' ')) === -1) { // if first space not found
+            message.channel.send('Please follow the format: \"!setup <channel> <message>');
+            return false;
+        }
+
+        let message_for_users;
+        let second_space;
+        let target_channel_name;
+        if ((second_space = message.content.indexOf(' ', first_space+1)) === -1) { // if no second space, use default message
+            message_for_users = defaultText;
+            target_channel_name = message.content.substring(first_space + 1);
+        }
+        else {
+            target_channel_name = message.content.substring(first_space + 1, second_space);
+            message_for_users = message.content.substring(second_space + 1);
+        }
+
+
+        let target_channel;
+        // parse channel string to clean it up
+        if (target_channel_name.startsWith('<#')) { // if a tagged channel highlighted, remove <# and >
+            target_channel_name = target_channel_name.substring(2, target_channel_name.length - 1); 
+            console.log(`modified channel name is ${target_channel_name}`);
+            target_channel = message.guild.channels.cache.get(target_channel_name);
+        }
+        else if (target_channel_name.startsWith('#')) { // if with a tag but not highlighted, just remove tag
+            target_channel_name = target_channel_name.substring(1);
+            target_channel = message.guild.channels.cache.find(channel => channel.name === target_channel_name);
+
+            // if not highlighted, make sure it exists
+            if (!target_channel) {
+                message.channel.send('Error: Invalid channel name');
+                return false;
+            }
+        }
+        else { // if just a string
+            // https://github.com/AnIdiotsGuide/discordjs-bot-guide/blob/master/frequently-asked-questions.md
+            target_channel = message.guild.channels.cache.find(channel => channel.name === target_channel_name);
+            if (!target_channel) {
+                message.channel.send('Error: Invalid channel name');
+                return false;
+            }
+        }
+        console.log(`channel name is ${target_channel_name}, and message is "${message_for_users}".`);
+
+        // send message
+        target_channel.send(message_for_users);
+        return true;
+    },
     eloToScore: function(message) {
         // extract relevant info from string
         let elo = message.content.substring(message.content.indexOf(' ') + 1);
@@ -25,12 +77,12 @@ module.exports = {
         }
         // small error checking
         else if (elo === -1) { // this occurs when elo isnt given
-            await message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>');
+            message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>');
             return -1;
         }
         // in case number is out of range
         else if (elo_number < 0 || elo_number > 3) {
-            await message.channel.send('Please enter a valid subrank number');
+            message.channel.send('Please enter a valid subrank number');
             return -1;
         }
 
@@ -67,7 +119,7 @@ module.exports = {
                 score = -10;
                 break;
             default: // if we get this far, there's an error
-                await message.channel.send('Only valid ranks are allowed');
+                message.channel.send('Only valid ranks are allowed');
                 return -1;
         }
 

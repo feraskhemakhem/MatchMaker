@@ -10,6 +10,7 @@
 // - (DONE) Alter team-making algorithm to treat unrated as the average
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
 // - Add option in setup to check tags instead of checking server
+// - Add "!help" or "!commands" to let people know the available commands
 
 // consts
 const Discord = require('discord.js');
@@ -32,6 +33,8 @@ const debug = true; // BOOLEAN FOR DEBUGGING :DD
 client.on('ready', () => {
     console.log(`I'm ready!`);
 });
+
+// client.on('raw', console.log);// just for seeing how raw works
  
 // constantly running callback for when a message is sent
 client.on('message', async message => {
@@ -135,7 +138,7 @@ client.on('message', async message => {
         random_dict[message.author.id] = score;
 
         // send message to confirm score value
-        await message.channel.send(`your rank was registered as ${elo}`);
+        await message.channel.send(`your rank was registered`);
     }
 
     else if (message.content.startsWith('!reroll')) { // in case we don't like the teams, we can reroll
@@ -154,15 +157,27 @@ client.on('message', async message => {
     }
 
     else if (message.content === '!ping') { // just something for testing
-        commands.printTeams(message, `t1`, `t2`, `no ad`);
+        // commands.printTeams(message, `t1`, `t2`, `no ad`);
+
+        message.channel.send(message.member.hasPermission('ADMINISTRATOR'));
+
+        message.channel.send(message.author.id);
     }
 
-    else if (message.content === '!myelo') {
+    else if (message.content === '!myelo') { // prints elo if user
         if (random_dict[message.author.id]) { // if rank exists, print it
             message.channel.send(`Your elo is ${random_dict[message.author.id]}`);
         }
         else { // otherwise indicate that rank doesnt exist
             message.channel.send(`No elo is recorded under your username`);
+        }
+    }
+
+    else if (message.content.startsWith('!setup') && message.member.hasPermission('ADMINISTRATOR')) { // set up reactions for assigning elos to players
+
+        if (!commands.setup(message, 'DEFAULT TEXT')) {
+            console.log(`!setup failure`);
+            return;
         }
     }
 
