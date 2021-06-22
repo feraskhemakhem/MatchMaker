@@ -153,7 +153,7 @@ client.on('message', async message => {
     }
     
     else if (message.content === '!v') { // prints the version of matchmaker
-        message.channel.send('MatchMaker v1.2');
+        message.channel.send('MatchMaker v1.3');
     }
 
     else if (message.content === '!ping') { // just something for testing
