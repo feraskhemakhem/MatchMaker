@@ -8,12 +8,12 @@ const puns = ['It was a match made in heaven', 'we make matches, not lighters', 
 // parameters: objects containing pairs of player ids and ranks (strings : Integers), and message reference for replying
 // output: ids of players on team 1, and team 2
 module.exports = { 
-    setup: function(message, defaultText) {
+    setup: async function(message, defaultText) {
         // some string parsing for reading the message content
         let first_space;
         if ((first_space = message.content.indexOf(' ')) === -1) { // if first space not found
             message.channel.send('Please follow the format: \"!setup <channel> <message>');
-            return false;
+            return undefined;
         }
 
         let message_for_users;
@@ -43,7 +43,7 @@ module.exports = {
             // if not highlighted, make sure it exists
             if (!target_channel) {
                 message.channel.send('Error: Invalid channel name');
-                return false;
+                return undefined;
             }
         }
         else { // if just a string
@@ -51,14 +51,13 @@ module.exports = {
             target_channel = message.guild.channels.cache.find(channel => channel.name === target_channel_name);
             if (!target_channel) {
                 message.channel.send('Error: Invalid channel name');
-                return false;
+                return undefined;
             }
         }
         console.log(`channel name is ${target_channel_name}, and message is "${message_for_users}".`);
 
         // send message
-        target_channel.send(message_for_users);
-        return true;
+        return await target_channel.send(message_for_users);
     },
     eloToScore: function(message) {
         // extract relevant info from string
@@ -67,12 +66,8 @@ module.exports = {
         let elo_number = parseInt(elo.substring(elo.indexOf(' ') + 1)) || -1;
 
         // edge case for no subrank number
-        if (elo === 'radiant') {
-            elo_bracket = 'radiant';
-            elo_number = 0;
-        }
-        else if (elo === 'unranked') {
-            elo_bracket = 'unranked';
+        if (elo === 'radiant' || elo === 'unranked' || elo === 'immortal') {
+            elo_bracket = elo;
             elo_number = 0;
         }
         // small error checking

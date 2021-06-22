@@ -46,12 +46,12 @@ client.on('message', async message => {
 
         // small error checking for number of players
         if (isNaN(num_players)) {
-            await message.channel.send('Please follow the format: \"!match <number of players>\"');
+            message.channel.send('Please follow the format: \"!match <number of players>\"');
             return;
         }
         if (!debug) {
             if (num_players < 2) {
-                await message.channel.send('At least 2 people required to make a match');
+                message.channel.send('At least 2 people required to make a match');
                 return;
             }
         }
@@ -157,11 +157,45 @@ client.on('message', async message => {
     }
 
     else if (message.content === '!ping') { // just something for testing
-        // commands.printTeams(message, `t1`, `t2`, `no ad`);
+        commands.printTeams(message, `t1`, `t2`, `no ad`);
 
-        message.channel.send(message.member.hasPermission('ADMINISTRATOR'));
+        // message.channel.send(message.member.hasPermission('ADMINISTRATOR'));
 
-        message.channel.send(message.author.id);
+        // message.channel.send(message.author.id);
+
+        // let emoji = message.guild.emojis.cache.get('856342795341922335');
+        // message.channel.send(`${emoji.id} id, ${emoji.identifier} identifier, ${emoji.name} name, ${emoji.url} url`);
+
+        // let emojis = message.guild.emojis.cache.filter(emoji => emoji.name.startsWith('match'));
+        // emojis = Array.from(emojis.values());
+        // console.log(`emojis: ${emojis}`);
+
+        // let emoji_names = [];
+        // emojis.forEach(element => emoji_names.push(element.name));
+
+        // console.log(`emoji names: ${emoji_names}`);
+
+        // let ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
+        // ranks.pop();
+        // message.channel.send(typeof(ranks));
+        // let word = 'stinky';
+        // message.guild.emojis.create('https://i.pinimg.com/originals/75/ab/5f/75ab5f38995a03bc9559d0210e6efc25.jpg', `uhoh${word}`, {reason:'For use with the MatchMaker bot'})
+        // .then(emoji => {
+        //     message.react(emoji);
+        //     console.log(JSON.stringify(emoji));
+        //     let new_message = message.channel.send(`howdy :D`);
+        //     new_message.then(nm => nm.react(emoji));
+        // })
+        // .catch(console.error);
+        // console.log(`ping done`);
+
+    //     let word = 'Iron';
+    //     message.guild.emojis.create('./valorantRankIcons/ValorantIron.webp', `Valorant${word}`, {reason:'For use with the MatchMaker bot'})
+    //     .then(emoji => {
+    //         message.react(emoji);
+    //         console.log(JSON.stringify(emoji));
+    //    })
+    //     .catch(console.error);
     }
 
     else if (message.content === '!myelo') { // prints elo if user
@@ -173,14 +207,61 @@ client.on('message', async message => {
         }
     }
 
-    else if (message.content.startsWith('!setup') && message.member.hasPermission('ADMINISTRATOR')) { // set up reactions for assigning elos to players
+    else if (message.content.startsWith('!setup') && // https://discord.js.org/#/docs/main/stable/class/Permissions
+        message.member.hasPermission('ADMINISTRATOR')) { // set up reactions for assigning elos to players
 
-        if (!commands.setup(message, 'DEFAULT TEXT')) {
+        if (!message.guild.available) {
+            console.log(`Guild not available for setup`);
+            return;
+        }
+
+        let default_text = 'Please choose your rank by selecting the reaction that corresponds to it. If you want to unselect a rank, click the same rank again';
+        let setup_message;
+        if (!(setup_message = commands.setup(message, default_text))) {
             console.log(`!setup failure`);
             return;
         }
-    }
 
+        console.log(`setup message type is ${JSON.stringify(setup_message)}`);
+
+        // if reactions do not exist, add them to server
+        // first, get a list of emojis with 'Valorant(rank)' names
+        let valorant_emojis = message.guild.emojis.cache.filter(emoji => emoji.name.startsWith('Valorant'));
+        valorant_emojis = Array.from(valorant_emojis.values());
+
+        // console.log(`pre-existing valorant emojis: ${valorant_emojis}`);
+
+        let emoji_names = [];
+        valorant_emojis.forEach(element => emoji_names.push(element.name));
+
+        // console.log(`emoji names: ${emoji_names}`);
+
+        // for each emoji that does not exist, add it to the server
+        let ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
+        for (const element of ranks) { // not the best but cleanest way to ensure order and linearity
+            let new_emoji;
+            if (emoji_names.indexOf(`Valorant${element}1`) === -1) { // if not found, add it then react
+                new_emoji = await message.guild.emojis.create(`./valorantRankIcons/Valorant${element}.webp`, `Valorant${element}`, {reason:'For use with the MatchMaker bot'});
+            }
+            else { // if emoji aready exists, react
+                new_emoji = valorant_emojis[emoji_names.indexOf(`Valorant${element}`)];
+            }
+            await setup_message
+            .then(value => { // promise to ensure setup complete
+                value.react(new_emoji);
+            })
+            .catch(result => console.log(result));
+         
+        }
+
+        message.channel.send(`Message sent`);
+    }
+    // else if (message.content === '!clear reactions') {
+    //     let emojis = Array.from(message.guild.emojis.cache.values());
+    //     emojis.forEach(element => {
+    //         element.delete('Clearing for more testing with MatchMaker');
+    //     });
+    // }
 });
 
 
