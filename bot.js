@@ -162,12 +162,18 @@ client.on('message', async message => {
     }
 
     else if (message.content === '!myelo') { // prints elo if user
+        console.log(`!myelo by ${message.author.id}`);
         if (!random_dict[message.author.id]) { // if rank doesnt exists, print it
-            message.channel.send(`No elo is recorded under your username`);
+            // react with 'norank using emojis'
+            // https://emojis.wiki/o-button-blood-type/
+            const no_rank_reactions = ['🇳', '🅾️', '🇪', '🇱', '🇴'];
+            no_rank_reactions.forEach(emoji => {
+                message.react(emoji);
+            });
+
             return;
         }
         // find the emoji we want given guild and elo
-        console.log(`my elo is ${commands.scoreToElo(random_dict[message.author.id])}`);
         const emoji = await commands.findValorantEmoji(message.guild, commands.scoreToElo(random_dict[message.author.id]));
 
         // otherwise, calculate rank and react with an emoji for that rank
@@ -232,7 +238,7 @@ client.on('message', async message => {
         let command_info = new Map();
         command_info.set('!match <number of players>', 'Begins process of matchmaking with an expected <number of players>');
         command_info.set('!reroll', 'Reattempts matchmaking with the same players as in the last !match pool');
-        command_info.set('!myelo', '');
+        command_info.set('!myelo', 'Reacts with your rank stored in the database.');
         command_info.set('!setelo', 'setelo info');
         command_info.set('!v', 'v info');
 
@@ -275,13 +281,6 @@ client.on('message', async message => {
         message.channel.send({files: [mm_mulan], embed: commands_embed});
     }
 
-    // else if (message.content === '!clear reactions') { // for clearing reactions while testing
-    //     let emojis = Array.from(message.guild.emojis.cache.values());
-    //     emojis.forEach(element => {
-    //         element.delete('Clearing for more testing with MatchMaker');
-    //     });
-    // }
-
     else if (message.content === '!v') { // prints the version of matchmaker
         // get version from package file
         message.channel.send(`MatchMaker ${package.version}`);
@@ -289,6 +288,10 @@ client.on('message', async message => {
 
     else if (message.author.id === '274360817707778050' && Math.random() > 0.9) { // a gift for rich :)
         message.channel.send('<@274360817707778050> go fuck yourself');
+    }
+
+    else if (message.author.id === '237113691332542464' && Math.random() > 0.9) { // another gift, for jesus <3
+        message.channel.send('<@237113691332542464> ur pp is big');
     }
 });
 
