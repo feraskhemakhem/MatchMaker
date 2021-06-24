@@ -1,6 +1,6 @@
 {
   "name": "matchmaker",
-  "version": "1.0.0",
+  "version": "2.0",
   "description": "Arranges teams for custom games based on elo",
   "main": "bot.js",
   "scripts": {
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/feraskhemakhem/MatchMaker#readme",
   "dependencies": {
-    "discord.js": "^12.5.3"
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0"
   }
 }
