@@ -41,7 +41,8 @@ _User Commands:_
   
 _Admin Commands:_
 
-- `!setup {#channel} {message}` sends setup message of content {message} to {#channel} and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. '!setup #roles "React your elo here"').    - WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED
+- `!setup {#channel} {message}` sends setup message of content {message} to {#channel} and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. '!setup #roles "React your elo here"').    
+   - WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED
    - Default message: "Please choose your rank by selecting the reaction that corresponds to it."
 - `!setelo <@user> {elo}` sets the elo of {@user} to {elo}. {elo} is a string which supports capitalisation and lowercase (e.g. `!setelo @cherry_blossom gold`)
 
