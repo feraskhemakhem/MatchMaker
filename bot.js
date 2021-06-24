@@ -17,6 +17,7 @@ const package = require('./package.json');   // info about the node.js project
 const Discord = require('discord.js');       // discord api reference
 const commands = require('./commands.js');   // self defined functions
 const dotenv = require('dotenv');           // for supporting a .env with secrets
+const { templateEmbed } = require('./commands.js');
 const client = new Discord.Client();        // for hosting a bot client in discord
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
@@ -26,8 +27,19 @@ dotenv.config();
 // temp const for testing
 const random_dict = {};
 
-// cached last players (only caches 1 team across all servers - would have to add to database for multiserver use)
-let cached_players = {};
+// cached last players (only caches 1 pool across all servers - would have to add to database for multiserver use)
+let cached_players = {
+    'jeff': 3,
+    'jesus': 2,
+    'rich': 3,
+    'max': 5,
+    'damon': 0,
+    'maddie': 2,
+    'cherry': 3,
+    'andrew': 1,
+    'tammi': 2,
+    'button': 1
+};
 
 const debug = true; // BOOLEAN FOR DEBUGGING :DD
 
@@ -113,7 +125,7 @@ client.on('message', async message => {
 
 
                     // make the teams
-                    if (!commands.makeTeams(elos, message, client)) { // if teams aren't made, let them know
+                    if (!commands.makeTeams(elos, message, client, Discord, mm_mulan)) { // if teams aren't made, let them know
                         message.channel.send('Unable to make teams with these players. Sorry :(');
                     }
 
@@ -156,7 +168,7 @@ client.on('message', async message => {
             message.channel.send('No player lists cached. Please use \"!match <player count>" instead');
             return;
         }
-        if (!commands.makeTeams(cached_players, message, client)) { // if teams aren't made, let them know
+        if (!commands.makeTeams(cached_players, message, client, Discord, mm_mulan)) { // if teams aren't made, let them know
             message.channel.send('Unable to make teams with these players. Sorry :(');
             return;
         }
@@ -175,7 +187,7 @@ client.on('message', async message => {
             return;
         }
         // find the emoji we want given guild and elo
-        const emoji = await commands.findValorantEmoji(message.guild, commands.scoreToElo(random_dict[message.author.id]));
+        const emoji = await commands.findValorantEmoji(commands.scoreToElo(random_dict[message.author.id]), message.guild);
 
         // otherwise, calculate rank and react with an emoji for that rank
         message.react(emoji);
@@ -242,21 +254,18 @@ client.on('message', async message => {
         command_info.set('!myelo', 'Reacts with user\'s elo stored in database');
         command_info.set('!setelo <elo>', 'Sets the elo of user to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo Radiant\')');
         command_info.set('!v', 'Replies with current release version of MatchMaker');
-
-        const command_names = command_info.keys();
         
         let admin_info = new Map();
         admin_info.set('!setup <#channel> <message>', 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'!setup #roles "React your elo here"\')');
         admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
         
+
+
         // create embedded message with necessary information
-        // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
-        const commands_embed = new Discord.MessageEmbed()
-            .setColor('#ffb7c5')
-            .setTitle('MatchMaker Commands')
-            .setAuthor('MatchMaker Bot', 'attachment://matchmakermulan.jpg', 'https://www.youtube.com/watch?v=fO263dPKqns') // link to 2nd best mulan song :)
-            .setTimestamp()
-            .setFooter('For further clarification, contact @cherry_blossom#0030')
+        const commands_embed = await templateEmbed(Discord, mm_mulan);  
+        commands_embed
+        .setFooter('For further clarifications, please contact cherry_blossom#0030')
+        .setTitle('MatchMaker Commands');
 
         // process commands for embed
         let user_command_string = '\u200B';
@@ -294,6 +303,11 @@ client.on('message', async message => {
 
     else if (message.author.id === '237113691332542464' && Math.random() > 0.9) { // another gift, for jesus <3
         message.channel.send('<@237113691332542464> ur pp is big');
+    }
+
+    else if (message.content === '!ping') {
+        const embed_msg =  await commands.templateEmbed(Discord, mm_mulan);
+        message.channel.send({files: [mm_mulan], embed: embed_msg});
     }
 });
 

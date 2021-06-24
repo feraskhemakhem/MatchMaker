@@ -11,7 +11,7 @@ module.exports = {
     // parameters: guild reference (server), string of elo
     // prints: N/A
     // returns: guild emoji for associated rank in the server
-    findValorantEmoji: async function(guild, elo) {
+    findValorantEmoji: async function(elo, guild) {
         let valorant_emojis = guild.emojis.cache.filter(emoji => emoji.name.startsWith(`Valorant${elo}`));
         valorant_emojis = Array.from(valorant_emojis.values());
         // console.log(valorant_emojis);
@@ -214,31 +214,63 @@ module.exports = {
     // parameters: channel reference for sending
     // prints: teamsi in embed message
     // returns: N/A
-    printTeams: function(channel, t1_string, t2_string, team_ad_string) {
+    printTeams: async function(t1_string, t2_string, team_ad_string, channel, Discord, icon) {
+        team_ad_string = team_ad_string + '\n\u200B';
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
-        channel.send({embed: {
-                color: '#ffb7c5', // cherry blossom hex
-                title: 'Teams:', // title could be better, but this is it for now...
-                fields: [ // actual team info
-                    {name: 'Team 1', value: `${t1_string}`, inline: true},
-                    {name: '\u200B', value: '\u200B', inline: true},
-                    {name: 'Team 2', value: `${t2_string}`, inline: true},
-                    {name: '\u200B', value: '\u200B'},
-                    {name: 'Advantage', value: team_ad_string},
-                ],
-                timestamp: new Date(), // to distinguish between matchings
-                footer: { // add a little pun at the bottom
-                    text: puns[Math.floor(Math.random() * puns.length)]
-                }
-            }
-        });
+        const teams_embed = await this.templateEmbed(Discord, icon);
+
+        console.log(`made`);
+
+        teams_embed
+        .setFooter(puns[Math.floor(Math.random() * puns.length)])  // add a little pun at the bottom
+        .setTitle('Teams')
+        .addFields(
+            {name: 'Team 1', value: `${t1_string}`, inline: true},
+            {name: '\u200B', value: '\u200B', inline: true},
+            {name: 'Team 2', value: `${t2_string}`, inline: true},
+            {name: '\u200B', value: '\u200B'},
+            {name: 'Advantage', value: team_ad_string},
+        );
+
+        console.log(`made 2`);
+        // channel.send({embed: {
+        //         author: {
+        //             name: 'MatchMaker  Bot',
+        //             icon_url: 'attachment://matchmakermulan.jpg',
+        //             url: 'https://www.youtube.com/watch?v=fO263dPKqns'
+        //         },
+        //         color: '#ffb7c5', // cherry blossom hex
+        //         title: 'Teams:', // title could be better, but this is it for now...
+        //         fields: [ // actual team info
+        //             {name: 'Team 1', value: `${t1_string}`, inline: true},
+        //             {name: '\u200B', value: '\u200B', inline: true},
+        //             {name: 'Team 2', value: `${t2_string}`, inline: true},
+        //             {name: '\u200B', value: '\u200B'},
+        //             {name: 'Advantage', value: team_ad_string},
+        //         ],
+        //         timestamp: new Date(), // to distinguish between matchings
+        //         footer: { // add a little pun at the bottom
+        //             text: puns[Math.floor(Math.random() * puns.length)]
+        //         }
+        //     }
+        // });
+        channel.send({files: [icon], embed: teams_embed});
+    },
+    templateEmbed: async function(Discord, icon) {
+        // template embed for all MatchMaker messages
+        // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
+        return commands_embed = await new Discord.MessageEmbed()
+            .setColor('#ffb7c5') // cherry blossom pink
+            .setAuthor('MatchMaker Bot', 'attachment://matchmakermulan.jpg', 'https://www.youtube.com/watch?v=fO263dPKqns') // link to 2nd best mulan song :)
+            .setTimestamp(); // to distinguish between embeds
+
     },
     // function for calculating the optimal teams
     // parameters: objects containing pairs of player ids and ranks (strings : Integers), message reference for replying, client
     // prints: teams
     // returns: bool for success
-    makeTeams: function(player_data, message, client) {
+    makeTeams: function(player_data, message, client, Discord, icon) {
 
         // step 0: create initial team lists
         // NOTE: ASSUMING ONLY 2 TEAMS
@@ -361,7 +393,7 @@ module.exports = {
                 }
 
                 // step 4: if team score is more than 1 stdev from expected total, restart algorithm
-                if (Math.abs(curr_team_score - (aps * team_size)) > stdev) {
+                if (Math.abs(curr_team_score - (aps * team_size)) > stdev / 2) {
                     bad_teams = true;
                     num_failures++;
                     continue;
@@ -384,7 +416,7 @@ module.exports = {
             team_advantage = 1;
         }
         // print warnings based on how large the team diff is
-        if (team_diff <= 4 && team_diff >= -4) {
+        if (team_diff <= 1.3 && team_diff >= -1.3) {
             // message.channel.send(`Warning: Team ${team_advantage} has a slight advantage`);
             team_ad_string = `Team ${team_advantage} has a slight advantage`;
         }
@@ -396,21 +428,21 @@ module.exports = {
         // collect users into string for printing
         // https://stackoverflow.com/questions/63069415/discord-js-how-to-get-a-discord-username-from-a-user-id
         let t1_string = '';
-        t1.forEach(element => {
-            let person = client.users.cache.get(element).username;
+        t1.forEach(person => {
+            // let person = client.users.cache.get(element).username;
             console.log(`person is: ${person}`);
             t1_string = t1_string + '\n' + person;
         });
 
         let t2_string = '';
-        t2.forEach(element => {
-            let person = client.users.cache.get(element).username;
+        t2.forEach(person => {
+            // let person = client.users.cache.get(element).username;
             console.log(`person is: ${person}`);
             t2_string = t2_string + '\n' + person;
         });
 
         // print results
-        this.printTeams(message.channel, t1_string, t2_string, team_ad_string);
+        this.printTeams(t1_string, t2_string, team_ad_string, message.channel, Discord, icon);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
     }
