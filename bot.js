@@ -9,8 +9,8 @@
 // - (DONE) Look into making elo-setting reaction-based
 // - (DONE) Alter team-making algorithm to treat unrated as the average
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
-// - Add option in setup to check tags instead of checking server
-// - Add "!help" or "!commands" to let people know the available commands
+// - (DONE) Add ability to view own rank
+// - (DONE) Add "!help" or "!commands" to let people know the available commands
 
 // consts
 const package = require('./package.json');   // info about the node.js project
@@ -126,7 +126,7 @@ client.on('message', async message => {
             	console.log(`Collected is ${collected}. After a minute, only ${collected.size} out of ${num_players} reacted.`);
             });
         } catch (error) {
-            console.log('error replying and reacting');
+            console.log('Error replying and reacting');
         }        
 
     }
@@ -135,21 +135,46 @@ client.on('message', async message => {
     else if (message.content.startsWith('!setelo')) {
 
         console.log('registering new elo');
+
+        const first_space = message.content.indexOf(' ');
+        const second_space = message.content.indexOf(' ', first_space+1);
+
+        let user_id = message.author.id;
+        let elo;
+
+        if (second_space === -1) {
+            elo = message.content.substring(first_space + 1);
+        }
+        else if (message.member.hasPermission('ADMINISTRATOR')) { // if requesting to change another user as an admin
+           let user_string = message.content.substring(second_space+1);
+           elo = message.content.substring(first_space + 1, second_space);
+           if (!(user_string.startsWith('<@!') && user_string.slice(-1) === '>')) { // error checking
+               message.channel.send('Error: tagged user required');
+               return;
+           }
+           user_id = user_string.substring(3, user_string.length - 1);
+        }
+        else {
+            message.channel.send('You do not have the permissions to change their rank');
+            return;
+        }
         
+        console.log(`user id is ${user_id}`);
+
         // calculate the score based on the elo provided
-        let elo = message.content.substring(message.content.indexOf(' ') + 1);
         elo = elo.charAt(0).toUpperCase() + elo.slice(1); // make first letter uppercase
 
         let score;
         if ((score = commands.eloToScore(elo)) === -1) { // if -1, then error, so return
+            message.channel.send('Error: problem processing this rank');
             return;
         }
 
         // TODO: add entry with user key and score to server
-        random_dict[message.author.id] = score;
+        random_dict[user_id] = score;
 
         // send message to confirm score value
-        await message.channel.send(`your rank was registered`);
+        message.channel.send(`your rank was registered`);
     }
 
     else if (message.content.startsWith('!reroll')) { // in case we don't like the teams, we can reroll
@@ -168,11 +193,12 @@ client.on('message', async message => {
         if (!random_dict[message.author.id]) { // if rank doesnt exists, print it
             // react with 'norank using emojis'
             // https://emojis.wiki/o-button-blood-type/
-            const no_rank_reactions = ['🇳', '🅾️', '🇪', '🇱', '🇴'];
-            no_rank_reactions.forEach(emoji => {
-                message.react(emoji);
-            });
+            // const no_rank_reactions = ['🇳', '🅾️', '🇪', '🇱', '🇴'];
+            // no_rank_reactions.forEach(emoji => {
+            //     message.react(emoji);
+            // });
 
+            message.react('🚫');
             return;
         }
         // find the emoji we want given guild and elo
@@ -245,7 +271,7 @@ client.on('message', async message => {
         command_info.set('!v', 'Replies with current release version of MatchMaker');
         
         let admin_info = new Map();
-        admin_info.set('!setup <#channel> <message>', 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'!setup #roles "React your elo here"\')');
+        admin_info.set('!setup <#channel> <message>', 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'!setup #roles "React your elo here"\'). WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED');
         admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
         
 
