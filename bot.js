@@ -273,11 +273,17 @@ client.on('message', async message => {
         admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
         
 
+        // add a little photo of my avatar if it can :)
+        const your_maker = client.users.cache.get('364583155623264256');
+        let my_photo_url = '';
+        if (your_maker) {
+            my_photo_url = your_maker.displayAvatarURL({size: 16});
+        }
 
         // create embedded message with necessary information
         const commands_embed = await templateEmbed(Discord);  
         commands_embed
-        .setFooter(`For further clarifications, please contact cherry_blossom#0030`, client.users.cache.get('364583155623264256').displayAvatarURL({size: 16}))
+        .setFooter(`For further clarifications, please contact cherry_blossom#0030`, my_photo_url)
         .setTitle('MatchMaker Commands');
 
         // process commands for embed
