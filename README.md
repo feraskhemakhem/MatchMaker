@@ -6,10 +6,10 @@
 
 Currently, functionality is only for Valorant. Values for matchmaking are tuned for Valorant only because it is the only game I am comformtable with that does 10-mans. Other games will be added in the future, but that will require outside reference for how the difference between ranks "feels" in those games. Additionally, some games like League of Legends have more specialized roles than Valorant, functionality for that might need to be considered.
 
-###Currently Supported Games:
+### Currently Supported Games:
 - Valorant
 
-###Next Games, In Order:
+### Next Games, In Order:
 - CS:GO
 - Leauge of Legends
 - Overwatch/Overwatch 2 (will support 6v6 _and_ 5v5 for each game's unique format)
@@ -34,18 +34,16 @@ Okay... the rest applies to all users, not just the admin. Once the admin has se
 
 _User Commands:_
 
-- `match <num players>` begins process of matchmaking with an expected <num players> players in the pool (e.g. `!match 10`)
+- `!match {num players}` begins process of matchmaking with an expected {num players} players in the pool (e.g. `!match 10`). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking.
 - `!reroll` reattempts matching with the same players as the last `!match` pool. For example, if teams are made with 8 set people, `!reroll` will make new teams with those exact same people
-- `!setelo <elo>` sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. `!setelo Radiant`)
+- `!setelo {elo}` sets the elo of user to {elo}. {elo} is a string which supports capitalisation and lowercase (e.g. `!setelo Radiant`)
 - `!v` replies with the current release version of MatchMaker
   
 _Admin Commands:_
 
--`!setup <#channel> <message>` sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. '!setup #roles "React your elo here"').    - WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED
+- `!setup {#channel} {message}` sends setup message of content {message} to {#channel} and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. '!setup #roles "React your elo here"').    - WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED
    - Default message: "Please choose your rank by selecting the reaction that corresponds to it."
-- `!setelo <@user> <elo>` sets the elo of <@user> to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. `!setelo @cherry_blossom gold`)
-
-- You can also use the `!setelo` command to set your elo. If you wish 
+- `!setelo <@user> {elo}` sets the elo of {@user} to {elo}. {elo} is a string which supports capitalisation and lowercase (e.g. `!setelo @cherry_blossom gold`)
 
 A reminder that for further guidance, `!commands` will provide details on each command.
 
