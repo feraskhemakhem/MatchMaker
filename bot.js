@@ -277,7 +277,7 @@ client.on('message', async message => {
         // create embedded message with necessary information
         const commands_embed = await templateEmbed(Discord);  
         commands_embed
-        .setFooter('For further clarifications, please contact cherry_blossom#0030')
+        .setFooter(`For further clarifications, please contact cherry_blossom#0030`, client.users.cache.get('364583155623264256').displayAvatarURL({size: 16}))
         .setTitle('MatchMaker Commands');
 
         // process commands for embed
@@ -327,6 +327,10 @@ client.on('message', async message => {
             stdev_ratio = parseFloat(key);
             message.react('👍');
         }
+    }
+    
+    else if (message.content === '!ping') {
+        message.channel.send(message.author.displayAvatarURL());
     }
 });
 
