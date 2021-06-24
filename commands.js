@@ -82,14 +82,17 @@ module.exports = {
             message_for_users = defaultText;
             target_channel_name = message.content.substring(first_space + 1);
         }
-        else {
+        else { // if second space, use that message
             target_channel_name = message.content.substring(first_space + 1, second_space);
-            message_for_users = message.content.substring(second_space + 1);
+            message_for_users = message.content.substring(second_space + 1).trim(); // also trim extra spaces around :)
+            // if quotes around message, remove them
+            if (message_for_users.charAt(0) === '\"' && message_for_users.slice(-1) === '\"') {
+                message_for_users = message_for_users.substring(1, message_for_users.length - 1);
+            }
         }
 
-
-        let target_channel;
         // parse channel string to clean it up
+        let target_channel;
         if (target_channel_name.startsWith('<#')) { // if a tagged channel highlighted, remove <# and >
             target_channel_name = target_channel_name.substring(2, target_channel_name.length - 1); 
             console.log(`modified channel name is ${target_channel_name}`);

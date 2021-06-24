@@ -40,6 +40,7 @@ const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.e
 // ON CREATION, PUT A MESSAGE IN THE SERVER ASKING FOR RANKS
 client.on('ready', () => {
     console.log(`I'm ready!`);
+    client.user.setActivity('!commands for help', {type: 'WATCHING'});
 });
  
 // constantly running callback for when a message is sent
@@ -230,22 +231,23 @@ client.on('message', async message => {
             await setup_message.react(new_emoji);
         }
 
-        message.channel.send(`Message sent`); 
+        message.channel.send(`Setup message sent`); 
     }
 
     else if (message.content === '!commands') {
         // print all matchmaker commands
         let command_info = new Map();
-        command_info.set('!match <number of players>', 'Begins process of matchmaking with an expected <number of players>');
-        command_info.set('!reroll', 'Reattempts matchmaking with the same players as in the last !match pool');
-        command_info.set('!myelo', 'Reacts with your rank stored in the database.');
-        command_info.set('!setelo', 'setelo info');
-        command_info.set('!v', 'v info');
+        command_info.set('!match <number of players>', 'Begins process of matchmaking with an expected <number of players> (e.g. \'!match 10\')');
+        command_info.set('!reroll', 'Reattempts matchmaking with the same players as the last !match pool');
+        command_info.set('!myelo', 'Reacts with user\'s elo stored in database');
+        command_info.set('!setelo <elo>', 'Sets the elo of user to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo Radiant\')');
+        command_info.set('!v', 'Replies with current release version of MatchMaker');
 
         const command_names = command_info.keys();
         
         let admin_info = new Map();
-        admin_info.set('!setup', 'setup info');
+        admin_info.set('!setup <#channel> <message>', 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'!setup #roles "React your elo here"\')');
+        admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
         
         // create embedded message with necessary information
         // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
