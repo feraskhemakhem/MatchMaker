@@ -219,9 +219,7 @@ module.exports = {
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
         const teams_embed = await this.templateEmbed(Discord, icon);
-
-        console.log(`made`);
-
+        
         teams_embed
         .setFooter(puns[Math.floor(Math.random() * puns.length)])  // add a little pun at the bottom
         .setTitle('Teams')
@@ -233,28 +231,6 @@ module.exports = {
             {name: 'Advantage', value: team_ad_string},
         );
 
-        console.log(`made 2`);
-        // channel.send({embed: {
-        //         author: {
-        //             name: 'MatchMaker  Bot',
-        //             icon_url: 'attachment://matchmakermulan.jpg',
-        //             url: 'https://www.youtube.com/watch?v=fO263dPKqns'
-        //         },
-        //         color: '#ffb7c5', // cherry blossom hex
-        //         title: 'Teams:', // title could be better, but this is it for now...
-        //         fields: [ // actual team info
-        //             {name: 'Team 1', value: `${t1_string}`, inline: true},
-        //             {name: '\u200B', value: '\u200B', inline: true},
-        //             {name: 'Team 2', value: `${t2_string}`, inline: true},
-        //             {name: '\u200B', value: '\u200B'},
-        //             {name: 'Advantage', value: team_ad_string},
-        //         ],
-        //         timestamp: new Date(), // to distinguish between matchings
-        //         footer: { // add a little pun at the bottom
-        //             text: puns[Math.floor(Math.random() * puns.length)]
-        //         }
-        //     }
-        // });
         channel.send({files: [icon], embed: teams_embed});
     },
     templateEmbed: async function(Discord, icon) {

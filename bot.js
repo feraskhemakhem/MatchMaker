@@ -28,18 +28,7 @@ dotenv.config();
 const random_dict = {};
 
 // cached last players (only caches 1 pool across all servers - would have to add to database for multiserver use)
-let cached_players = {
-    'jeff': 3,
-    'jesus': 2,
-    'rich': 3,
-    'max': 5,
-    'damon': 0,
-    'maddie': 2,
-    'cherry': 3,
-    'andrew': 1,
-    'tammi': 2,
-    'button': 1
-};
+let cached_players = {};
 
 const debug = true; // BOOLEAN FOR DEBUGGING :DD
 
