@@ -13,11 +13,12 @@
 // - Add "!help" or "!commands" to let people know the available commands
 
 // consts
-const package = require('./package.json');
-const Discord = require('discord.js');
-const commands = require('./commands.js');
-const dotenv = require('dotenv');
-const client = new Discord.Client();
+const package = require('./package.json');   // info about the node.js project
+const Discord = require('discord.js');       // discord api reference
+const commands = require('./commands.js');   // self defined functions
+const dotenv = require('dotenv');           // for supporting a .env with secrets
+const client = new Discord.Client();        // for hosting a bot client in discord
+const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
 //https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
 dotenv.config();
@@ -161,12 +162,16 @@ client.on('message', async message => {
     }
 
     else if (message.content === '!myelo') { // prints elo if user
-        if (random_dict[message.author.id]) { // if rank exists, print it
-            message.channel.send(`Your elo is ${commands.scoreToElo(random_dict[message.author.id])}`);
-        }
-        else { // otherwise indicate that rank doesnt exist
+        if (!random_dict[message.author.id]) { // if rank doesnt exists, print it
             message.channel.send(`No elo is recorded under your username`);
+            return;
         }
+        // find the emoji we want given guild and elo
+        console.log(`my elo is ${commands.scoreToElo(random_dict[message.author.id])}`);
+        const emoji = await commands.findValorantEmoji(message.guild, commands.scoreToElo(random_dict[message.author.id]));
+
+        // otherwise, calculate rank and react with an emoji for that rank
+        message.react(emoji);
     }
 
     else if (message.content.startsWith('!setup') && // https://discord.js.org/#/docs/main/stable/class/Permissions
@@ -211,7 +216,7 @@ client.on('message', async message => {
         for (const element of ranks) { // not the best but cleanest way to ensure order and linearity
             let new_emoji;
             if (emoji_names.indexOf(`Valorant${element}`) === -1) { // if not found, add it then react
-                new_emoji = await message.guild.emojis.create(`./valorantRankIcons/Valorant${element}.webp`, `Valorant${element}`, {reason:'For use with the MatchMaker bot'});
+                new_emoji = await message.guild.emojis.create(`./assets/Valorant${element}.webp`, `Valorant${element}`, {reason:'For use with the MatchMaker bot'});
             }
             else { // if emoji aready exists, react
                 new_emoji = valorant_emojis[emoji_names.indexOf(`Valorant${element}`)];
@@ -220,6 +225,54 @@ client.on('message', async message => {
         }
 
         message.channel.send(`Message sent`); 
+    }
+
+    else if (message.content === '!commands') {
+        // print all matchmaker commands
+        let command_info = new Map();
+        command_info.set('!match <number of players>', 'Begins process of matchmaking with an expected <number of players>');
+        command_info.set('!reroll', 'Reattempts matchmaking with the same players as in the last !match pool');
+        command_info.set('!myelo', '');
+        command_info.set('!setelo', 'setelo info');
+        command_info.set('!v', 'v info');
+
+        const command_names = command_info.keys();
+        
+        let admin_info = new Map();
+        admin_info.set('!setup', 'setup info');
+        
+        // create embedded message with necessary information
+        // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
+        const commands_embed = new Discord.MessageEmbed()
+            .setColor('#ffb7c5')
+            .setTitle('MatchMaker Commands')
+            .setAuthor('MatchMaker Bot', 'attachment://matchmakermulan.jpg', 'https://www.youtube.com/watch?v=fO263dPKqns') // link to 2nd best mulan song :)
+            .setTimestamp()
+            .setFooter('For further clarification, contact @cherry_blossom#0030')
+
+        // process commands for embed
+        let user_command_string = '\u200B';
+        for (let [command, info] of command_info) {
+            // commands_embed.addField(command, info, false);
+            user_command_string = user_command_string + `\n` + `\`${command}\`\n${info}\n`;
+        }
+        user_command_string = user_command_string + `\u200B`;
+
+        if (message.member.hasPermission('ADMINISTRATOR')) {// if mod, have 2 categories
+            let admin_command_string = '\u200B';
+            for (let [command, info] of admin_info) {
+                // commands_embed.addField(command, info, false);
+                admin_command_string = admin_command_string + `\n` + `\`${command}\`\n${info}\n`;
+            }
+            admin_command_string = admin_command_string + `\u200B`;
+            commands_embed.addField('User Commands', user_command_string, true);
+            commands_embed.addField('Admin Commands', admin_command_string, true);
+        }
+        else { // no need to subcategorize if not an admin
+            commands_embed.addField('\u200B', user_command_string);
+        }
+
+        message.channel.send({files: [mm_mulan], embed: commands_embed});
     }
 
     // else if (message.content === '!clear reactions') { // for clearing reactions while testing

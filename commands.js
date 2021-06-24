@@ -7,6 +7,26 @@ const ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immor
 
 
 module.exports = {
+    // function for getting valorant rank emoji for specific elo
+    // parameters: guild reference (server), string of elo
+    // prints: N/A
+    // returns: guild emoji for associated rank in the server
+    findValorantEmoji: async function(guild, elo) {
+        let valorant_emojis = guild.emojis.cache.filter(emoji => emoji.name.startsWith(`Valorant${elo}`));
+        valorant_emojis = Array.from(valorant_emojis.values());
+        // console.log(valorant_emojis);
+        let emoji_names = [];
+        valorant_emojis.forEach(element => emoji_names.push(element.name));
+        // console.log(valorant_emojis);
+        
+        if (emoji_names.indexOf(`Valorant${elo}`) === -1) { // if not found, add it then react
+            new_emoji = await guild.emojis.create(`./assets/Valorant${elo}.webp`, `Valorant${elo}`, {reason:'For use with the MatchMaker bot'});
+        }
+        else { // if emoji aready exists, react
+            new_emoji = valorant_emojis[emoji_names.indexOf(`Valorant${elo}`)];
+        }
+        return new_emoji;
+    },
     // function for processing elo reaction in !setup message
     // parameters: reaction reference, user that reacted
     // prints: N/A
