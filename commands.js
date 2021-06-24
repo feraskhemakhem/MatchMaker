@@ -218,8 +218,8 @@ module.exports = {
         team_ad_string = team_ad_string + '\n\u200B';
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
-        const teams_embed = await this.templateEmbed(Discord, icon);
-        
+        const teams_embed = await this.templateEmbed(Discord);
+
         teams_embed
         .setFooter(puns[Math.floor(Math.random() * puns.length)])  // add a little pun at the bottom
         .setTitle('Teams')
@@ -233,7 +233,11 @@ module.exports = {
 
         channel.send({files: [icon], embed: teams_embed});
     },
-    templateEmbed: async function(Discord, icon) {
+    // function for creating initial template for embed messages
+    // parameters: discord reference
+    // prints: N/A
+    // returns: reference to embed message
+    templateEmbed: async function(Discord) {
         // template embed for all MatchMaker messages
         // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
         return commands_embed = await new Discord.MessageEmbed()
@@ -246,7 +250,7 @@ module.exports = {
     // parameters: objects containing pairs of player ids and ranks (strings : Integers), message reference for replying, client
     // prints: teams
     // returns: bool for success
-    makeTeams: function(player_data, message, client, Discord, icon) {
+    makeTeams: function(player_data, message, client, Discord, icon, stdev_ratio) {
 
         // step 0: create initial team lists
         // NOTE: ASSUMING ONLY 2 TEAMS
@@ -369,7 +373,7 @@ module.exports = {
                 }
 
                 // step 4: if team score is more than 1 stdev from expected total, restart algorithm
-                if (Math.abs(curr_team_score - (aps * team_size)) > stdev / 2) {
+                if (Math.abs(curr_team_score - (aps * team_size)) > stdev * stdev_ratio) {
                     bad_teams = true;
                     num_failures++;
                     continue;
@@ -393,26 +397,24 @@ module.exports = {
         }
         // print warnings based on how large the team diff is
         if (team_diff <= 1.3 && team_diff >= -1.3) {
-            // message.channel.send(`Warning: Team ${team_advantage} has a slight advantage`);
             team_ad_string = `Team ${team_advantage} has a slight advantage`;
         }
         else {
-            // message.channel.send(`Warning: Team ${team_advantage} has a large advantage`);
             team_ad_string = `Team ${team_advantage} has a large advantage`;
         }
 
         // collect users into string for printing
         // https://stackoverflow.com/questions/63069415/discord-js-how-to-get-a-discord-username-from-a-user-id
         let t1_string = '';
-        t1.forEach(person => {
-            // let person = client.users.cache.get(element).username;
+        t1.forEach(element => {
+            let person = client.users.cache.get(element).username;
             console.log(`person is: ${person}`);
             t1_string = t1_string + '\n' + person;
         });
 
         let t2_string = '';
-        t2.forEach(person => {
-            // let person = client.users.cache.get(element).username;
+        t2.forEach(element => {
+            let person = client.users.cache.get(element).username;
             console.log(`person is: ${person}`);
             t2_string = t2_string + '\n' + person;
         });

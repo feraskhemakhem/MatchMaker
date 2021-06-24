@@ -30,10 +30,10 @@ const random_dict = {};
 // cached last players (only caches 1 pool across all servers - would have to add to database for multiserver use)
 let cached_players = {};
 
-const debug = true; // BOOLEAN FOR DEBUGGING :DD
+const debug = false; // BOOLEAN FOR DEBUGGING :DD
 
-// guild message for setting elos
-let server_setup_message;
+// ratio of stdev to which it is broken. This is a variable solely for field testing
+let stdev_ratio = 0.5;
 
 // reaction collector for setting elos
 const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
@@ -114,7 +114,7 @@ client.on('message', async message => {
 
 
                     // make the teams
-                    if (!commands.makeTeams(elos, message, client, Discord, mm_mulan)) { // if teams aren't made, let them know
+                    if (!commands.makeTeams(elos, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
                         message.channel.send('Unable to make teams with these players. Sorry :(');
                     }
 
@@ -157,7 +157,7 @@ client.on('message', async message => {
             message.channel.send('No player lists cached. Please use \"!match <player count>" instead');
             return;
         }
-        if (!commands.makeTeams(cached_players, message, client, Discord, mm_mulan)) { // if teams aren't made, let them know
+        if (!commands.makeTeams(cached_players, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
             message.channel.send('Unable to make teams with these players. Sorry :(');
             return;
         }
@@ -251,7 +251,7 @@ client.on('message', async message => {
 
 
         // create embedded message with necessary information
-        const commands_embed = await templateEmbed(Discord, mm_mulan);  
+        const commands_embed = await templateEmbed(Discord);  
         commands_embed
         .setFooter('For further clarifications, please contact cherry_blossom#0030')
         .setTitle('MatchMaker Commands');
@@ -294,9 +294,15 @@ client.on('message', async message => {
         message.channel.send('<@237113691332542464> ur pp is big');
     }
 
-    else if (message.content === '!ping') {
-        const embed_msg =  await commands.templateEmbed(Discord, mm_mulan);
-        message.channel.send({files: [mm_mulan], embed: embed_msg});
+    else if (message.content.startsWith('!stdev_ratio')) {
+        const key = message.content.substring(message.content.indexOf(' ') + 1);
+        if (key === '?') { // if asking for ratio
+            message.channel.send(stdev_ratio);
+        }
+        else if (!isNaN(parseFloat(key))) { // if float
+            stdev_ratio = parseFloat(key);
+            message.react('👍');
+        }
     }
 });
 
