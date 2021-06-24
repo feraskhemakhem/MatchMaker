@@ -134,7 +134,6 @@ client.on('message', async message => {
     // WARNING: THIS ONLY WORKS FOR VALORANT RN
     else if (message.content.startsWith('!setelo')) {
 
-        console.log('registering new elo');
 
         const first_space = message.content.indexOf(' ');
         const second_space = message.content.indexOf(' ', first_space+1);
@@ -158,9 +157,8 @@ client.on('message', async message => {
             message.channel.send('You do not have the permissions to change their rank');
             return;
         }
+        console.log(`registering new elo for ${user_id}`);
         
-        console.log(`user id is ${user_id}`);
-
         // calculate the score based on the elo provided
         elo = elo.charAt(0).toUpperCase() + elo.slice(1); // make first letter uppercase
 
@@ -214,10 +212,10 @@ client.on('message', async message => {
         // make sure server is available, suggested by documentation
         if (!message.guild.available) {
             console.log(`Guild not available for setup`);
-            return;
+            return; 
         }
 
-        let default_text = 'Please choose your rank by selecting the reaction that corresponds to it. If you want to unselect a rank, click the same rank again';
+        let default_text = 'Please choose your rank by selecting the reaction that corresponds to it.';
         let setup_message;
         
         if (!(setup_message = await commands.setup(message, default_text))) {
@@ -264,15 +262,15 @@ client.on('message', async message => {
     else if (message.content === '!commands') {
         // print all matchmaker commands
         let command_info = new Map();
-        command_info.set('!match <number of players>', 'Begins process of matchmaking with an expected <number of players> (e.g. \'!match 10\')');
-        command_info.set('!reroll', 'Reattempts matchmaking with the same players as the last !match pool');
+        command_info.set('!match <number of players>', 'Begins process of matchmaking with an expected <number of players> (e.g. \'!match 10\'). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking');
+        command_info.set('!reroll', 'Reattempts matchmaking with the same players as the last !match pool. For example, if teams are made with 8 set people, !reroll will make new teams with those exact same people');
         command_info.set('!myelo', 'Reacts with user\'s elo stored in database');
-        command_info.set('!setelo <elo>', 'Sets the elo of user to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo Radiant\')');
+        command_info.set('!setelo <elo>', 'Sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'!setelo Radiant\')');
         command_info.set('!v', 'Replies with current release version of MatchMaker');
         
         let admin_info = new Map();
         admin_info.set('!setup <#channel> <message>', 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'!setup #roles "React your elo here"\'). WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED');
-        admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
+        admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
         
 
 
