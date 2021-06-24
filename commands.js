@@ -3,11 +3,50 @@
 
 // just some puns
 const puns = ['It was a match made in heaven', 'we make matches, not lighters', 'the match of the century'];
+const ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
 
-// function for calculating the optimal teams
-// parameters: objects containing pairs of player ids and ranks (strings : Integers), and message reference for replying
-// output: ids of players on team 1, and team 2
-module.exports = { 
+
+module.exports = {
+    // function for processing elo reaction in !setup message
+    // parameters: reaction reference, user that reacted
+    // prints: N/A
+    // returns: score of valorant rank reactions
+    processEloReaction: function(reaction, user) {
+        // register player at given elo
+        let elo = 'no rank found';
+        
+        // look through each rank and find one rank in reaction name
+        ranks.forEach(rank => {
+            // if found, set elo to it and break loop
+            if (reaction.emoji.name.indexOf(rank) !== -1) {
+                elo = rank;
+            } 
+        });
+
+        // calculate score from elo
+        let score = this.eloToScore(elo);
+
+        console.log(`Elo is ${elo} with score if ${score}`);
+
+        // finally, remove reaction
+        // messagereaction -> reaction user manager -> remove()
+        reaction.users.remove(user);
+
+        return score;
+
+    },
+    // function for determining whether emoji is a valorant rank emoji or not
+    // parameters: string of reaction name
+    // prints: N/A
+    // returns: bool of whether reaction is a valorant rank emoji
+    isValorantEmoji: function(reaction_name) {
+        // check if any name starts with "Valorant(rank)"
+        return ranks.some(rank => reaction_name.startsWith(`Valorant${rank}`)); // apparently for each doesnt work but this is cleaner
+    },
+    // function for parsing !setup command and sending setup message
+    // parameters: original !setup message, default text if no text is given
+    // prints: setup message in requested channel
+    // returns: setup message, or undefined if failed
     setup: async function(message, defaultText) {
         // some string parsing for reading the message content
         let first_space;
@@ -59,76 +98,103 @@ module.exports = {
         // send message
         return await target_channel.send(message_for_users);
     },
-    eloToScore: function(message) {
+    // function for calculating string elo of player based on score
+    // parameters: numeric score of player
+    // prints: N/A
+    // returns: string of elo based on score
+    scoreToElo: function(score) {
+        if (score < 0 || score > 8) { // outside boundary
+            console.log(`out of bounds score is ${score}`);
+            return undefined;
+        }
+        return ranks[score];
+    },
+    // function for calculating numeric score of player based on elo
+    // parameters: string of elo
+    // prints: N/A
+    // returns: numeric score of provided elo
+    eloToScore: function(elo) {
         // extract relevant info from string
-        let elo = message.content.substring(message.content.indexOf(' ') + 1);
-        let elo_bracket = elo.substring(0, elo.indexOf(' '));
-        let elo_number = parseInt(elo.substring(elo.indexOf(' ') + 1)) || -1;
+        // let elo_bracket = elo.substring(0, elo.indexOf(' '));
+        // let elo_number = parseInt(elo.substring(elo.indexOf(' ') + 1)) || -1;
 
         // edge case for no subrank number
-        if (elo === 'radiant' || elo === 'unranked' || elo === 'immortal') {
-            elo_bracket = elo;
-            elo_number = 0;
-        }
+        // if (elo === 'radiant' || elo === 'unranked' || elo === 'immortal') {
+        //     elo_bracket = elo;
+        //     elo_number = 0;
+        // }
         // small error checking
-        else if (elo === -1) { // this occurs when elo isnt given
-            message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>');
+        /*else */if (elo === -1) { // this occurs when elo isnt given
+            /*message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>'); */
+            console.log(`Elo isn's given?... : ${elo}`);
             return -1;
         }
         // in case number is out of range
-        else if (elo_number < 0 || elo_number > 3) {
-            message.channel.send('Please enter a valid subrank number');
-            return -1;
+        // else if (elo_number < 0 || elo_number > 3) {
+        //     message.channel.send('Please enter a valid subrank number');
+        //     return -1;
+        // }
+
+        // let score = 0;
+        // set initial score based on bracket
+
+        // plat is same as platinum
+        if (elo === 'Plat') {
+            elo = 'Platinum';
         }
 
-        let score = 0;
-        // set initial score based on bracket
-        // NOTE: probably cleaner with an enum equivilent
-        switch(elo_bracket) {
-            case "iron":
-                score = 0;
-                break;
-            case "bronze":
-                score = 1;
-                break;
-            case "silver":
-                score = 2;
-                break;
-            case "gold":
-                score = 3;
-                break;
-            case "platinum":
-            case "plat":
-                score = 4;
-                break;
-            case "diamond":
-                score = 5;
-                break;
-            case "immortal":
-                score = 6;
-                break;
-            case "radiant":
-                score = 7;
-                break;
-            case "unranked": // unranked is negative as to ignore the rank in the future
-                score = -10;
-                break;
-            default: // if we get this far, there's an error
-                message.channel.send('Only valid ranks are allowed');
-                return -1;
-        }
+        let score = ranks.indexOf(elo);
+
+        // console.log(`Score if ${elo} is ${score}`);
+        // switch(elo_bracket) {
+        //     case "Iron":
+        //         score = 0;
+        //         break;
+        //     case "Bronze":
+        //         score = 1;
+        //         break;
+        //     case "silver":
+        //         score = 2;
+        //         break;
+        //     case "gold":
+        //         score = 3;
+        //         break;
+        //     case "platinum":
+        //     case "plat":
+        //         score = 4;
+        //         break;
+        //     case "diamond":
+        //         score = 5;
+        //         break;
+        //     case "immortal":
+        //         score = 6;
+        //         break;
+        //     case "radiant":
+        //         score = 7;
+        //         break;
+        //     case "unranked": // unranked is negative as to ignore the rank in the future
+        //         score = -10;
+        //         break;
+        //     default: // if we get this far, there's an error
+        //         // message.channel.send('Only valid ranks are allowed');
+        //         return -1;
+        // }
 
         // now consider number for elo
-        score *= 3;
-        score += elo_number;
+        // score *= 3;
+        // score += elo_number;
 
         // return final score
         return score;
     },
-    printTeams: function(message, t1_string, t2_string, team_ad_string) {
+    // function for printing teams using embed message
+    // parameters: channel reference for sending
+    // prints: teamsi in embed message
+    // returns: N/A
+    printTeams: function(channel, t1_string, t2_string, team_ad_string) {
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
-        message.channel.send({embed: {
+        channel.send({embed: {
                 color: '#ffb7c5', // cherry blossom hex
                 title: 'Teams:', // title could be better, but this is it for now...
                 fields: [ // actual team info
@@ -145,6 +211,10 @@ module.exports = {
             }
         });
     },
+    // function for calculating the optimal teams
+    // parameters: objects containing pairs of player ids and ranks (strings : Integers), message reference for replying, client
+    // prints: teams
+    // returns: bool for success
     makeTeams: function(player_data, message, client) {
 
         // step 0: create initial team lists
@@ -317,7 +387,7 @@ module.exports = {
         });
 
         // print results
-        this.printTeams(message, t1_string, t2_string, team_ad_string);
+        this.printTeams(message.channel, t1_string, t2_string, team_ad_string);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
     }

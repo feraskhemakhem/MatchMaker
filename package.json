@@ -1,6 +1,6 @@
 {
   "name": "matchmaker",
-  "version": "1.2",
+  "version": "1.4",
   "description": "Arranges teams for custom games based on elo",
   "main": "bot.js",
   "scripts": {

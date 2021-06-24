@@ -6,13 +6,14 @@
 // - (DONE) Tweak the UI for displaying (esp advantage). it doesnt feel full enough... find more stuff to put idk
 // - (DONE) Dont let people make matches with 1 or less people (eventually i guess?)
 // - Look into SQL Lite and see if it's worth it for this scope
-// - Look into making elo-setting reaction-based
+// - (DONE) Look into making elo-setting reaction-based
 // - (DONE) Alter team-making algorithm to treat unrated as the average
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
 // - Add option in setup to check tags instead of checking server
 // - Add "!help" or "!commands" to let people know the available commands
 
 // consts
+const package = require('./package.json');
 const Discord = require('discord.js');
 const commands = require('./commands.js');
 const dotenv = require('dotenv');
@@ -29,12 +30,16 @@ let cached_players = {};
 
 const debug = true; // BOOLEAN FOR DEBUGGING :DD
 
+// guild message for setting elos
+let server_setup_message;
+
+// reaction collector for setting elos
+const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
+
 // ON CREATION, PUT A MESSAGE IN THE SERVER ASKING FOR RANKS
 client.on('ready', () => {
     console.log(`I'm ready!`);
 });
-
-// client.on('raw', console.log);// just for seeing how raw works
  
 // constantly running callback for when a message is sent
 client.on('message', async message => {
@@ -129,8 +134,11 @@ client.on('message', async message => {
         console.log('registering new elo');
         
         // calculate the score based on the elo provided
+        let elo = message.content.substring(message.content.indexOf(' ') + 1);
+        elo = elo.charAt(0).toUpperCase() + elo.slice(1); // make first letter uppercase
+
         let score;
-        if ((score = commands.eloToScore(message)) === -1) { // if -1, then error, so return
+        if ((score = commands.eloToScore(elo)) === -1) { // if -1, then error, so return
             return;
         }
 
@@ -151,56 +159,10 @@ client.on('message', async message => {
             return;
         }
     }
-    
-    else if (message.content === '!v') { // prints the version of matchmaker
-        message.channel.send('MatchMaker v1.3');
-    }
-
-    else if (message.content === '!ping') { // just something for testing
-        commands.printTeams(message, `t1`, `t2`, `no ad`);
-
-        // message.channel.send(message.member.hasPermission('ADMINISTRATOR'));
-
-        // message.channel.send(message.author.id);
-
-        // let emoji = message.guild.emojis.cache.get('856342795341922335');
-        // message.channel.send(`${emoji.id} id, ${emoji.identifier} identifier, ${emoji.name} name, ${emoji.url} url`);
-
-        // let emojis = message.guild.emojis.cache.filter(emoji => emoji.name.startsWith('match'));
-        // emojis = Array.from(emojis.values());
-        // console.log(`emojis: ${emojis}`);
-
-        // let emoji_names = [];
-        // emojis.forEach(element => emoji_names.push(element.name));
-
-        // console.log(`emoji names: ${emoji_names}`);
-
-        // let ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
-        // ranks.pop();
-        // message.channel.send(typeof(ranks));
-        // let word = 'stinky';
-        // message.guild.emojis.create('https://i.pinimg.com/originals/75/ab/5f/75ab5f38995a03bc9559d0210e6efc25.jpg', `uhoh${word}`, {reason:'For use with the MatchMaker bot'})
-        // .then(emoji => {
-        //     message.react(emoji);
-        //     console.log(JSON.stringify(emoji));
-        //     let new_message = message.channel.send(`howdy :D`);
-        //     new_message.then(nm => nm.react(emoji));
-        // })
-        // .catch(console.error);
-        // console.log(`ping done`);
-
-    //     let word = 'Iron';
-    //     message.guild.emojis.create('./valorantRankIcons/ValorantIron.webp', `Valorant${word}`, {reason:'For use with the MatchMaker bot'})
-    //     .then(emoji => {
-    //         message.react(emoji);
-    //         console.log(JSON.stringify(emoji));
-    //    })
-    //     .catch(console.error);
-    }
 
     else if (message.content === '!myelo') { // prints elo if user
         if (random_dict[message.author.id]) { // if rank exists, print it
-            message.channel.send(`Your elo is ${random_dict[message.author.id]}`);
+            message.channel.send(`Your elo is ${commands.scoreToElo(random_dict[message.author.id])}`);
         }
         else { // otherwise indicate that rank doesnt exist
             message.channel.send(`No elo is recorded under your username`);
@@ -210,6 +172,7 @@ client.on('message', async message => {
     else if (message.content.startsWith('!setup') && // https://discord.js.org/#/docs/main/stable/class/Permissions
         message.member.hasPermission('ADMINISTRATOR')) { // set up reactions for assigning elos to players
 
+        // make sure server is available, suggested by documentation
         if (!message.guild.available) {
             console.log(`Guild not available for setup`);
             return;
@@ -217,55 +180,64 @@ client.on('message', async message => {
 
         let default_text = 'Please choose your rank by selecting the reaction that corresponds to it. If you want to unselect a rank, click the same rank again';
         let setup_message;
-        if (!(setup_message = commands.setup(message, default_text))) {
-            console.log(`!setup failure`);
+        
+        if (!(setup_message = await commands.setup(message, default_text))) {
+            console.log(`ahaha`);
             return;
         }
 
-        console.log(`setup message type is ${JSON.stringify(setup_message)}`);
+        // assign message to server setup message
+        // also create reaction collector for assigning elos
+        server_setup_message = setup_message;
+        const elo_collector = setup_message.createReactionCollector(collector_filter);
+        // collect elo reactions
+        elo_collector.on('collect', (reaction, user) => {
+            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+            // process elo reaction
+            random_dict[user.id] = commands.processEloReaction(reaction, user);
+        });
+        console.log(`setup message resolved`);
 
         // if reactions do not exist, add them to server
         // first, get a list of emojis with 'Valorant(rank)' names
         let valorant_emojis = message.guild.emojis.cache.filter(emoji => emoji.name.startsWith('Valorant'));
         valorant_emojis = Array.from(valorant_emojis.values());
 
-        // console.log(`pre-existing valorant emojis: ${valorant_emojis}`);
-
         let emoji_names = [];
         valorant_emojis.forEach(element => emoji_names.push(element.name));
-
-        // console.log(`emoji names: ${emoji_names}`);
 
         // for each emoji that does not exist, add it to the server
         let ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
         for (const element of ranks) { // not the best but cleanest way to ensure order and linearity
             let new_emoji;
-            if (emoji_names.indexOf(`Valorant${element}1`) === -1) { // if not found, add it then react
+            if (emoji_names.indexOf(`Valorant${element}`) === -1) { // if not found, add it then react
                 new_emoji = await message.guild.emojis.create(`./valorantRankIcons/Valorant${element}.webp`, `Valorant${element}`, {reason:'For use with the MatchMaker bot'});
             }
             else { // if emoji aready exists, react
                 new_emoji = valorant_emojis[emoji_names.indexOf(`Valorant${element}`)];
             }
-            await setup_message
-            .then(value => { // promise to ensure setup complete
-                value.react(new_emoji);
-            })
-            .catch(result => console.log(result));
-         
+            await setup_message.react(new_emoji);
         }
 
-        message.channel.send(`Message sent`);
+        message.channel.send(`Message sent`); 
     }
-    // else if (message.content === '!clear reactions') {
+
+    // else if (message.content === '!clear reactions') { // for clearing reactions while testing
     //     let emojis = Array.from(message.guild.emojis.cache.values());
     //     emojis.forEach(element => {
     //         element.delete('Clearing for more testing with MatchMaker');
     //     });
     // }
+
+    else if (message.content === '!v') { // prints the version of matchmaker
+        // get version from package file
+        message.channel.send(`MatchMaker ${package.version}`);
+    }
+
+    else if (message.author.id === '274360817707778050' && Math.random() > 0.9) { // a gift for rich :)
+        message.channel.send('<@274360817707778050> go fuck yourself');
+    }
 });
-
-
-
 
  
 
