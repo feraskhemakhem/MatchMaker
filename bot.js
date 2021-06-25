@@ -38,14 +38,38 @@ let stdev_ratio = 0.5;
 // reaction collector for setting elos
 const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
 
-// ON CREATION, PUT A MESSAGE IN THE SERVER ASKING FOR RANKS
-client.on('ready', () => {
-    console.log(`I'm ready!`);
+// a reference to me :)
+let your_maker;
+
+// on the bot waking up
+client.on('ready', async () => {
+    // set user status
     client.user.setActivity('!commands for help', {type: 'WATCHING'});
+
+    if (!your_maker) { // wait for a reference to author's user
+        const app = await client.fetchApplication();
+        your_maker = app.owner;
+    }
+    console.log(`I'm ready!`);
 });
  
 // constantly running callback for when a message is sent
 client.on('message', async message => {
+
+    /************************************  slash integration ************************************/
+
+    // if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
+	// 	const data = {
+	// 		name: 'match',
+	// 		description: 'Replies with Pong!',
+	// 	};
+
+	// 	const command = await client.guilds.cache.get('625862970135805983')?.commands.create(data); // this is the guild id of my testing server
+	// 	console.log(command);
+	// }
+
+
+    /************************************ actual commands ************************************/
     if (message.content.startsWith('!match')) {
 
         // extract number of players
@@ -273,17 +297,11 @@ client.on('message', async message => {
         admin_info.set('!setelo <@user> <elo>', '!Sets the elo of <@user> to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'!setelo @cherry_blossom gold\')');
         
 
-        // add a little photo of my avatar if it can :)
-        const your_maker = client.users.cache.get('364583155623264256');
-        let my_photo_url = '';
-        if (your_maker) {
-            my_photo_url = your_maker.displayAvatarURL({size: 16});
-        }
 
         // create embedded message with necessary information
         const commands_embed = await templateEmbed(Discord);  
         commands_embed
-        .setFooter(`For further clarifications, please contact cherry_blossom#0030`, my_photo_url)
+        .setFooter(`For further clarifications, please contact ${your_maker.tag}`, your_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
         .setTitle('MatchMaker Commands');
 
         // process commands for embed
