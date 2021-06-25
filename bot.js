@@ -2,44 +2,43 @@
 //         - add option to move people to given channels (automatically move to Val and Val2)
 //         - make setting elo reaction-based
 
-// Next:
-// - (DONE) Tweak the UI for displaying (esp advantage). it doesnt feel full enough... find more stuff to put idk
-// - (DONE) Dont let people make matches with 1 or less people (eventually i guess?)
+// For v3.0:
+// - Make code more efficient / argument based
+// - Make commands slash-based instead of exlcimation-based
 // - Look into SQL Lite and see if it's worth it for this scope
-// - (DONE) Look into making elo-setting reaction-based
-// - (DONE) Alter team-making algorithm to treat unrated as the average
-// - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
-// - (DONE) Add ability to view own rank
-// - (DONE) Add "!help" or "!commands" to let people know the available commands
 
-// consts
+// Potentially for v3.0:
+// - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
+
+
+/********************************* CONSTS *********************************/
+
 const package = require('./package.json');   // info about the node.js project
 const Discord = require('discord.js');       // discord api reference
 const commands = require('./commands.js');   // self defined functions
 const dotenv = require('dotenv');           // for supporting a .env with secrets
-const { templateEmbed } = require('./commands.js');
 const client = new Discord.Client();        // for hosting a bot client in discord
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
-//https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
-dotenv.config();
+dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
 
-// temp const for testing
-const random_dict = {};
 
-// cached last players (only caches 1 pool across all servers - would have to add to database for multiserver use)
-let cached_players = {};
+/********************************* GLOBAL VARIABLES *********************************/
 
-const debug = false; // BOOLEAN FOR DEBUGGING :DD
+// temp fields (to server later)
+const random_dict = {};     // temp const for testing
+let cached_players = {};    // cached last players (only caches 1 pool across all servers - would have to add to database for multiserver use)
 
-// ratio of stdev to which it is broken. This is a variable solely for field testing
-let stdev_ratio = 0.5;
+// for testing
+const debug = true;         // BOOLEAN FOR DEBUGGING :DD
+let stdev_ratio = 0.5;      // ratio of stdev to which it is broken. This is a variable solely for field testing
 
-// reaction collector for setting elos
-const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
+// for fulltime use
+let your_maker;             // a reference to me :)
+const prefix = '/';
 
-// a reference to me :)
-let your_maker;
+
+/********************************* FUNCTIONS *********************************/
 
 // on the bot waking up
 client.on('ready', async () => {
@@ -56,17 +55,14 @@ client.on('ready', async () => {
 // constantly running callback for when a message is sent
 client.on('message', async message => {
 
-    /************************************  slash integration ************************************/
+    /************************************ preprocessing of arguments ************************************/
+    // https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments
 
-    // if (message.content.toLowerCase() === '!deploy' && message.author.id === client.application?.owner.id) {
-	// 	const data = {
-	// 		name: 'match',
-	// 		description: 'Replies with Pong!',
-	// 	};
+    // if command prefix is not found or message comes from bot, ignore it
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-	// 	const command = await client.guilds.cache.get('625862970135805983')?.commands.create(data); // this is the guild id of my testing server
-	// 	console.log(command);
-	// }
+	const args = message.content.slice(prefix.length).trim().split(' ');
+	const command = args.shift().toLowerCase();
 
 
     /************************************ actual commands ************************************/
@@ -247,9 +243,9 @@ client.on('message', async message => {
             return;
         }
 
-        // assign message to server setup message
+        // reaction collector for setting elos
+        const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
         // also create reaction collector for assigning elos
-        server_setup_message = setup_message;
         const elo_collector = setup_message.createReactionCollector(collector_filter);
         // collect elo reactions
         elo_collector.on('collect', (reaction, user) => {
