@@ -334,10 +334,6 @@ client.on('message', async message => {
             message.react('👍');
         }
     }
-    
-    else if (message.content === '!ping') {
-        message.channel.send(message.author.displayAvatarURL());
-    }
 });
 
  
