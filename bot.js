@@ -15,7 +15,7 @@
 
 const package = require('./package.json');   // info about the node.js project
 const Discord = require('discord.js');       // discord api reference
-const commands = require('./commands.js');   // self defined functions
+const helper = require('./helper.js');   // self defined functions
 const dotenv = require('dotenv');           // for supporting a .env with secrets
 const client = new Discord.Client();        // for hosting a bot client in discord
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
@@ -35,7 +35,7 @@ let stdev_ratio = 0.5;      // ratio of stdev to which it is broken. This is a v
 
 // for fulltime use
 let your_maker;             // a reference to me :)
-const prefix = '/';
+const prefix = '!';
 
 
 /********************************* FUNCTIONS *********************************/
@@ -56,12 +56,13 @@ client.on('ready', async () => {
 client.on('message', async message => {
 
     /************************************ preprocessing of arguments ************************************/
-    // https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments
+    // based on https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments
 
     // if command prefix is not found or message comes from bot, ignore it
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-	const args = message.content.slice(prefix.length).trim().split(' ');
+    // store arguments and the actual command in variables
+	const args = message.content.slice(prefix.length).trim().split(/ +/); // use regex to split by any # of spaces
 	const command = args.shift().toLowerCase();
 
 
@@ -74,12 +75,12 @@ client.on('message', async message => {
 
         // small error checking for number of players
         if (isNaN(num_players)) {
-            message.channel.send('Please follow the format: \"!match <number of players>\"');
+            message.reply('Please follow the format: \"!match <number of players>\"');
             return;
         }
         if (!debug) {
             if (num_players < 2) {
-                message.channel.send('At least 2 people required to make a match');
+                message.reply('At least 2 people required to make a match');
                 return;
             }
         }
@@ -134,15 +135,15 @@ client.on('message', async message => {
 
 
                     // make the teams
-                    if (!commands.makeTeams(elos, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
-                        message.channel.send('Unable to make teams with these players. Sorry :(');
+                    if (!helper.makeTeams(elos, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
+                        message.reply('Unable to make teams with these players. Sorry :(');
                     }
 
                     // cache last set of players used
                     cached_players = elos;
                 })
                 .catch(collected => { 
-                message.channel.send('Polling has closed. Not enough people have chosen to participate.');
+                message.reply('Polling has closed. Not enough people have chosen to participate.');
             	console.log(`Collected is ${collected}. After a minute, only ${collected.size} out of ${num_players} reacted.`);
             });
         } catch (error) {
@@ -165,16 +166,15 @@ client.on('message', async message => {
             elo = message.content.substring(first_space + 1);
         }
         else if (message.member.hasPermission('ADMINISTRATOR')) { // if requesting to change another user as an admin
-           let user_string = message.content.substring(second_space+1);
-           elo = message.content.substring(first_space + 1, second_space);
-           if (!(user_string.startsWith('<@!') && user_string.slice(-1) === '>')) { // error checking
-               message.channel.send('Error: tagged user required');
-               return;
-           }
-           user_id = user_string.substring(3, user_string.length - 1);
+            elo = message.content.substring(first_space + 1, second_space);
+            if (!message.mentions.users.size) { 
+                message.reply('If you want to change a user\'s elo, follow the format: !setelo <elo> <@user>');
+            }
+            // get first person mentioned in message
+            user_id = message.mentions.users.first();
         }
         else {
-            message.channel.send('You do not have the permissions to change their rank');
+            message.reply('You do not have the permissions to change their rank');
             return;
         }
         console.log(`registering new elo for ${user_id}`);
@@ -183,8 +183,8 @@ client.on('message', async message => {
         elo = elo.charAt(0).toUpperCase() + elo.slice(1); // make first letter uppercase
 
         let score;
-        if ((score = commands.eloToScore(elo)) === -1) { // if -1, then error, so return
-            message.channel.send('Error: problem processing this rank');
+        if ((score = helper.eloToScore(elo)) === -1) { // if -1, then error, so return
+            message.reply('Error: problem processing this rank');
             return;
         }
 
@@ -192,15 +192,15 @@ client.on('message', async message => {
         random_dict[user_id] = score;
 
         // send message to confirm score value
-        message.channel.send(`your rank was registered`);
+        message.reply(`your rank was registered`);
     }
 
     else if (message.content.startsWith('!reroll')) { // in case we don't like the teams, we can reroll
         if (Object.entries(cached_players).length === 0) { // check if cached team is empty
-            message.channel.send('No player lists cached. Please use \"!match <player count>" instead');
+            message.reply('No player lists cached. Please use \"!match <player count>" instead');
             return;
         }
-        if (!commands.makeTeams(cached_players, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
+        if (!helper.makeTeams(cached_players, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
             message.channel.send('Unable to make teams with these players. Sorry :(');
             return;
         }
@@ -220,7 +220,7 @@ client.on('message', async message => {
             return;
         }
         // find the emoji we want given guild and elo
-        const emoji = await commands.findValorantEmoji(commands.scoreToElo(random_dict[message.author.id]), message.guild);
+        const emoji = await helper.findValorantEmoji(helper.scoreToElo(random_dict[message.author.id]), message.guild);
 
         // otherwise, calculate rank and react with an emoji for that rank
         message.react(emoji);
@@ -238,20 +238,20 @@ client.on('message', async message => {
         let default_text = 'Please choose your rank by selecting the reaction that corresponds to it.';
         let setup_message;
         
-        if (!(setup_message = await commands.setup(message, default_text))) {
+        if (!(setup_message = await helper.setup(message, default_text))) {
             console.log(`ahaha`);
             return;
         }
 
         // reaction collector for setting elos
-        const collector_filter = (reaction, user) => commands.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
+        const collector_filter = (reaction, user) => helper.isValorantEmoji(reaction.emoji.name) && user.id !== client.user.id;
         // also create reaction collector for assigning elos
         const elo_collector = setup_message.createReactionCollector(collector_filter);
         // collect elo reactions
         elo_collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
             // process elo reaction
-            random_dict[user.id] = commands.processEloReaction(reaction, user);
+            random_dict[user.id] = helper.processEloReaction(reaction, user);
         });
         console.log(`setup message resolved`);
 
@@ -276,7 +276,7 @@ client.on('message', async message => {
             await setup_message.react(new_emoji);
         }
 
-        message.channel.send(`Setup message sent`); 
+        message.reply(`Setup message sent`); 
     }
 
     else if (message.content === '!commands') {
@@ -295,7 +295,7 @@ client.on('message', async message => {
 
 
         // create embedded message with necessary information
-        const commands_embed = await templateEmbed(Discord);  
+        const commands_embed = await helper.templateEmbed(Discord);  
         commands_embed
         .setFooter(`For further clarifications, please contact ${your_maker.tag}`, your_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
         .setTitle('MatchMaker Commands');
@@ -322,31 +322,39 @@ client.on('message', async message => {
             commands_embed.addField('\u200B', user_command_string);
         }
 
-        message.channel.send({files: [mm_mulan], embed: commands_embed});
+        message.reply({files: [mm_mulan], embed: commands_embed});
     }
 
     else if (message.content === '!v') { // prints the version of matchmaker
         // get version from package file
-        message.channel.send(`MatchMaker ${package.version}`);
+        message.reply(`MatchMaker ${package.version}`);
     }
 
     else if (message.author.id === '274360817707778050' && Math.random() > 0.9) { // a gift for rich :)
-        message.channel.send('<@274360817707778050> go fuck yourself');
+        message.reply('go fuck yourself');
     }
 
     else if (message.author.id === '237113691332542464' && Math.random() > 0.9) { // another gift, for jesus <3
-        message.channel.send('<@237113691332542464> ur pp is big');
+        message.reply('ur pp is big');
     }
 
     else if (message.content.startsWith('!stdev_ratio')) {
         const key = message.content.substring(message.content.indexOf(' ') + 1);
         if (key === '?') { // if asking for ratio
-            message.channel.send(stdev_ratio);
+            message.reply(stdev_ratio);
         }
         else if (!isNaN(parseFloat(key))) { // if float
             stdev_ratio = parseFloat(key);
             message.react('👍');
         }
+    }
+
+    else if (command === 'args-info') {
+        if (!args.length) {
+            return message.reply(`You didn't provide any arguments, ${message.author}!`);
+        }
+
+        message.reply(`Command name: ${command}\nArguments: ${args}`);
     }
 });
 
