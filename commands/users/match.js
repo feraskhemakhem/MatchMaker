@@ -6,17 +6,15 @@ const helper = require('../helper.js');
 module.exports = {
     // command name
 	name: 'match',
+    args: 1,
+    admin: false,
+    usage: '<number of players>',
     // description of command
 	description: 'Begins process of matchmaking with an expected <number of players> (e.g. \"/match 10\"). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking',
 
     // actual command code
 	async execute(message, args, data, client) {
         const debug = true;
-        // check number of args
-        if (args.length !== 1) {
-            message.reply('Error: incorrect number of arguments. Please follow the format: \"/match <number of players>\"');
-            return;
-        }
 
         // extract number of players
         let num_players = parseInt(args[0]);

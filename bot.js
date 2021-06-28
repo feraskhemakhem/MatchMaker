@@ -41,7 +41,7 @@ let stdev_ratio = 0.5;      // ratio of stdev to which it is broken. This is a v
 
 // for fulltime use
 let your_maker;             // a reference to me :)
-const prefix = '!';
+const prefix = '/';
 
 
 /********************************* FUNCTIONS *********************************/
@@ -62,7 +62,7 @@ client.on('ready', async () => {
 
     // for each subfolder, get all the files ending in js
     for (const folder of commandFolders) {
-        if (folder !== 'currentlyworking' && debug) continue;
+        if (folder.endsWith('js')) continue; // if a file and not a folder, skip
         const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
         // for each file, add the command to client.commands
         for (const file of commandFiles) {
@@ -92,6 +92,24 @@ client.on('message', async message => {
     // https://discordjs.guide/command-handling/#dynamically-executing-commands
     if (!client.commands.has(commandName)) return;
     const command = client.commands.get(commandName);
+
+    // make setup function invalid FOR NOw :(
+    if (commandName === 'setup') return;
+
+    // if admin command, get out of here!
+    if (command.admin && message.member.hasPermission('ADMINISTRATOR')) return;
+
+    // she's a beaut: https://discordjs.guide/command-handling/adding-features.html#expected-command-usage
+    // if incorrectly formatted, send strongly worded message
+    if (command.args !== args.length) {
+        let reply = `Error: incorrect number of arguments provided`;
+
+        if (command.usage) {
+            reply += `\nPlease follow the format: ${prefix}${command.name} ${command.usage}`;
+        }
+        return message.reply(reply);
+    }
+
     let returned_value;
 
     try {
@@ -101,8 +119,9 @@ client.on('message', async message => {
         message.reply('there was an error trying to execute this command :/');
     }
 
-    console.log(`returned value is ${JSON.stringify(returned_value)}`);
+    // console.log(`returned value is ${JSON.stringify(returned_value)}`);
 
+    // if returned, update db
     if (returned_value !== undefined) {
         data = returned_value;
         // write the data received back into the temp database

@@ -6,15 +6,14 @@ const helper = require('../helper.js');
 module.exports = {
     // command name
 	name: 'setelo',
+    args: 1,
+    admin: false,
+    usage: '<elo>',
     // description of command
 	description: 'Sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'/setelo Radiant\')',
 
     // actual command code
 	async execute(message, args, data) {
-        if (args.length !== 1) {
-            message.reply('Error: incorrect number of arguments. Please use the following format: \'/setelo <elo>\'');
-            return undefined;
-        }
 
         let user_id = message.author.id;
         let elo = args[0].charAt(0).toUpperCase() + args[0].slice(1); // make first letter uppercase of first arg

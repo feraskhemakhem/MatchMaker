@@ -6,6 +6,9 @@ const helper = require('../helper.js');
 module.exports = {
     // command name
 	name: 'myelo',
+    args: 0,
+    admin: false,
+    usage: '',
     // description of command
 	description: 'Reacts with user\'s elo stored in database',
 
@@ -13,7 +16,6 @@ module.exports = {
 	async execute(message, args, data) {
         console.log(`/myelo by ${message.author.id}`);
         if (!data.player_elos[message.author.id]) { // if rank doesnt exists, print it
-
             message.react('🚫');
             return;
         }

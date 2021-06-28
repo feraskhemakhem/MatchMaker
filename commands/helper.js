@@ -143,29 +143,12 @@ module.exports = {
     // prints: N/A
     // returns: numeric score of provided elo
     eloToScore: function(elo) {
-        // extract relevant info from string
-        // let elo_bracket = elo.substring(0, elo.indexOf(' '));
-        // let elo_number = parseInt(elo.substring(elo.indexOf(' ') + 1)) || -1;
-
-        // edge case for no subrank number
-        // if (elo === 'radiant' || elo === 'unranked' || elo === 'immortal') {
-        //     elo_bracket = elo;
-        //     elo_number = 0;
-        // }
         // small error checking
-        /*else */if (elo === -1) { // this occurs when elo isnt given
+        if (elo === -1) { // this occurs when elo isnt given
             /*message.channel.send('Please follow the format: \"!setelo <rank bracket> <subrank number>'); */
             console.log(`Elo isn's given?... : ${elo}`);
             return -1;
         }
-        // in case number is out of range
-        // else if (elo_number < 0 || elo_number > 3) {
-        //     message.channel.send('Please enter a valid subrank number');
-        //     return -1;
-        // }
-
-        // let score = 0;
-        // set initial score based on bracket
 
         // plat is same as platinum
         if (elo === 'Plat') {
@@ -174,46 +157,6 @@ module.exports = {
 
         let score = ranks.indexOf(elo);
 
-        // console.log(`Score if ${elo} is ${score}`);
-        // switch(elo_bracket) {
-        //     case "Iron":
-        //         score = 0;
-        //         break;
-        //     case "Bronze":
-        //         score = 1;
-        //         break;
-        //     case "silver":
-        //         score = 2;
-        //         break;
-        //     case "gold":
-        //         score = 3;
-        //         break;
-        //     case "platinum":
-        //     case "plat":
-        //         score = 4;
-        //         break;
-        //     case "diamond":
-        //         score = 5;
-        //         break;
-        //     case "immortal":
-        //         score = 6;
-        //         break;
-        //     case "radiant":
-        //         score = 7;
-        //         break;
-        //     case "unranked": // unranked is negative as to ignore the rank in the future
-        //         score = -10;
-        //         break;
-        //     default: // if we get this far, there's an error
-        //         // message.channel.send('Only valid ranks are allowed');
-        //         return -1;
-        // }
-
-        // now consider number for elo
-        // score *= 3;
-        // score += elo_number;
-
-        // return final score
         return score;
     },
     // function for printing teams using embed message

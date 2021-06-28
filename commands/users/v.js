@@ -6,6 +6,9 @@ const package = require('../../package.json');
 module.exports = {
     // command name
 	name: 'v',
+    args: 0,
+    admin: false,
+    usage: '',
     // description of command
 	description: 'Replies with current release version of MatchMaker',
 
