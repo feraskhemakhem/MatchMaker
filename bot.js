@@ -14,7 +14,7 @@
 /********************************* CONSTS *********************************/
 
 const fs = require('fs');                   //  node.js native file system
-const package = require('./package.json');  // info about the node.js project
+// const package = require('./package.json');  // info about the node.js project
 const Discord = require('discord.js');      // discord api reference
 // const helper = require('./helper.js');      // self defined functions
 const dotenv = require('dotenv');           // for supporting a .env with secrets
@@ -92,25 +92,29 @@ client.on('message', async message => {
     // https://discordjs.guide/command-handling/#dynamically-executing-commands
     if (!client.commands.has(commandName)) return;
     const command = client.commands.get(commandName);
+    let returned_value;
 
     try {
-        data = command.execute(message, args, data); // run command with args and database reference
+        returned_value = await command.execute(message, args, data, client); // run command with args and database reference
     } catch (error) { // if there's an error, print it as well as a message in the chat
         console.error(error);
         message.reply('there was an error trying to execute this command :/');
     }
 
-    console.log(`writing: ${JSON.stringify(data)}`);
+    console.log(`returned value is ${JSON.stringify(returned_value)}`);
 
-    // write the data received back into the temp database
-    fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
-    
-        // Checking for errors
-        if (err) console.log('error storing to database'); 
-    
-        // if you've reached this point, update db successfully
-        console.log('db update complete'); 
-    });
+    if (returned_value !== undefined) {
+        data = returned_value;
+        // write the data received back into the temp database
+        fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
+        
+            // Checking for errors
+            if (err) console.log('error storing to database'); 
+        
+            // if you've reached this point, update db successfully
+            console.log('db update complete'); 
+        });
+    }
 
 
 

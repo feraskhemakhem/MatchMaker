@@ -7,12 +7,12 @@ module.exports = {
     // command name
 	name: 'setelo',
     // description of command
-	description: 'Sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'!setelo Radiant\')',
+	description: 'Sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'/setelo Radiant\')',
 
     // actual command code
-	execute(message, args, data) {
+	async execute(message, args, data) {
         if (args.length !== 1) {
-            message.reply('Error: incorrect number of arguments. Please use the following format: \'!setelo <elo>\'');
+            message.reply('Error: incorrect number of arguments. Please use the following format: \'/setelo <elo>\'');
             return undefined;
         }
 
@@ -29,7 +29,7 @@ module.exports = {
         }
 
         // add data to temp database
-        data.elo_data[`${user_id}`] = score;
+        data.player_elos[user_id] = score;
 
         // send message to confirm score value
         message.reply(`your rank was registered`);

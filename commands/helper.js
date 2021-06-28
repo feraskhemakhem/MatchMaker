@@ -1,10 +1,16 @@
 // https://stackoverflow.com/questions/50426635/exporting-importing-in-node-js-discord-js
 
+/****************************** CONSTS ******************************/
+
+const Discord = require('discord.js'); // discord api reference
+const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
 // just some puns
 const puns = ['It was a match made in heaven', 'we make matches, not lighters', 'the match of the century'];
 const ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
 
+
+/****************************** FUNCTIONS ******************************/
 
 module.exports = {
     // function for getting valorant rank emoji for specific elo
@@ -71,7 +77,7 @@ module.exports = {
         // some string parsing for reading the message content
         let first_space;
         if ((first_space = message.content.indexOf(' ')) === -1) { // if first space not found
-            message.channel.send('Please follow the format: \"!setup <channel> <message>');
+            message.channel.send('Please follow the format: \"/setup <channel> <message>\"');
             return undefined;
         }
 
@@ -214,11 +220,11 @@ module.exports = {
     // parameters: channel reference for sending
     // prints: teamsi in embed message
     // returns: N/A
-    printTeams: async function(t1_string, t2_string, team_ad_string, channel, Discord, icon) {
+    printTeams: async function(t1_string, t2_string, team_ad_string, channel) {
         team_ad_string = team_ad_string + '\n\u200B';
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
-        const teams_embed = await this.templateEmbed(Discord);
+        const teams_embed = await this.templateEmbed();
 
         teams_embed
         .setFooter(puns[Math.floor(Math.random() * puns.length)])  // add a little pun at the bottom
@@ -231,13 +237,13 @@ module.exports = {
             {name: 'Advantage', value: team_ad_string},
         );
 
-        channel.send({files: [icon], embed: teams_embed});
+        channel.send({files: [mm_mulan], embed: teams_embed});
     },
     // function for creating initial template for embed messages
     // parameters: discord reference
     // prints: N/A
     // returns: reference to embed message
-    templateEmbed: async function(Discord) {
+    templateEmbed: async function() {
         // template embed for all MatchMaker messages
         // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
         return commands_embed = await new Discord.MessageEmbed()
@@ -250,7 +256,7 @@ module.exports = {
     // parameters: objects containing pairs of player ids and ranks (strings : Integers), message reference for replying, client
     // prints: teams
     // returns: bool for success
-    makeTeams: function(player_data, message, client, Discord, icon, stdev_ratio) {
+    makeTeams: function(player_data, message, client, stdev_ratio) {
 
         // step 0: create initial team lists
         // NOTE: ASSUMING ONLY 2 TEAMS
@@ -274,6 +280,12 @@ module.exports = {
             }
         }
         aps = aps / num_players;
+
+        // in the edge case that all are unranked, set aps to 0
+        if (num_players === 0) {
+            aps = 0;
+        }
+
         num_players = Object.keys(player_data).length; // set num players back to what it was before
 
         // set unranked players' values to average (aps)
@@ -394,13 +406,13 @@ module.exports = {
         }
         else if (team_diff > 0) { // if difference is negative, first team has advantage
             team_advantage = 1;
-        }
-        // print warnings based on how large the team diff is
-        if (team_diff <= 1.3 && team_diff >= -1.3) {
-            team_ad_string = `Team ${team_advantage} has a slight advantage`;
-        }
-        else {
-            team_ad_string = `Team ${team_advantage} has a large advantage`;
+            // print warnings based on how large the team diff is
+            if (team_diff <= 1.3 || team_diff >= -1.3) {
+                team_ad_string = `Team ${team_advantage} has a slight advantage`;
+            }
+            else {
+                team_ad_string = `Team ${team_advantage} has a large advantage`;
+            }
         }
 
         // collect users into string for printing
@@ -420,7 +432,7 @@ module.exports = {
         });
 
         // print results
-        this.printTeams(t1_string, t2_string, team_ad_string, message.channel, Discord, icon);
+        this.printTeams(t1_string, t2_string, team_ad_string, message.channel);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
     }

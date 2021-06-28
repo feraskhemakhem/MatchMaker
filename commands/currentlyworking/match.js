@@ -1,25 +1,34 @@
 // js file for the match command
 
+// self-defined helper functions
+const helper = require('../helper.js');
+
 module.exports = {
     // command name
 	name: 'match',
     // description of command
-	description: 'Begins process of matchmaking with an expected <number of players> (e.g. \'!match 10\'). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking',
+	description: 'Begins process of matchmaking with an expected <number of players> (e.g. \"/match 10\"). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking',
 
     // actual command code
-	execute(message, args) {
+	async execute(message, args, data, client) {
+        const debug = true;
+        // check number of args
+        if (args.length !== 1) {
+            message.reply('Error: incorrect number of arguments. Please follow the format: \"/match <number of players>\"');
+            return;
+        }
+
         // extract number of players
-        let digits = /\d+/;
-        let num_players = parseInt(message.content.match(digits));
+        let num_players = parseInt(args[0]);
 
         // small error checking for number of players
         if (isNaN(num_players)) {
-            message.reply('Please follow the format: \"!match <number of players>\"');
+            message.reply('Error: expected a number. Please follow the format: \"/match <number of players>\"');
             return;
         }
         if (!debug) {
             if (num_players < 2) {
-                message.reply('At least 2 people required to make a match');
+                message.reply('Error: At least 2 people required to make a match');
                 return;
             }
         }
@@ -36,7 +45,8 @@ module.exports = {
             };
 
             // structure inspired by https://stackoverflow.com/questions/50058056/how-to-use-awaitreactions-in-guildmemberadd
-            reply.awaitReactions(filter, { max: num_players, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
+            // await ensures that we don't return before reactions complete
+            await reply.awaitReactions(filter, { max: num_players, time: 60000, errors: ['time'] }) // waiting 1 minute for 1 responses
                 .then(collected => {
                     console.log('Responses recorded...');
 
@@ -61,25 +71,27 @@ module.exports = {
                     // find these ids in the list and make a dictionary of their elos
                     let elos = {};
                     ids.forEach(element => {
-                        if (random_dict[element]) {
-                            elos[element] = random_dict[element];
+                        console.log(data.player_elos);
+                        if (data.player_elos[element]) { // if found, just read it lol
+                            elos[element] = data.player_elos[element];
                         }
-                        else { // if rank is not found, set to unranked
-                            elos[element] = -30;
-                            random_dict[element] = -30;
+                        else { // if rank is not found, use random negative number
+                            elos[element] = -69;
                         }
                     });
+
 
                     console.log(`elos are: ${JSON.stringify(elos)}`);
 
 
                     // make the teams
-                    if (!helper.makeTeams(elos, message, client, Discord, mm_mulan, stdev_ratio)) { // if teams aren't made, let them know
+                    if (!helper.makeTeams(elos, message, client, data.stdev_ratio)) { // if teams aren't made, let them know
                         message.reply('Unable to make teams with these players. Sorry :(');
                     }
 
                     // cache last set of players used
-                    cached_players = elos;
+                    data.cached_players = ids;
+                    
                 })
                 .catch(collected => { 
                 message.reply('Polling has closed. Not enough people have chosen to participate.');
@@ -87,6 +99,7 @@ module.exports = {
             });
         } catch (error) {
             console.log('Error replying and reacting');
-        }   	
+        }
+        return data; // return for new cached players db update
     },
 };
