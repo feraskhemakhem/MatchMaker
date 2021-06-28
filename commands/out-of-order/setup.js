@@ -1,4 +1,4 @@
-// js file for the match command
+// js file for the setup command
 
 // self-defined helper functions
 const helper = require('../helper.js');

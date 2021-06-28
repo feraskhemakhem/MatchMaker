@@ -41,7 +41,7 @@ let stdev_ratio = 0.5;      // ratio of stdev to which it is broken. This is a v
 
 // for fulltime use
 let your_maker;             // a reference to me :)
-const prefix = '/';
+const prefix = '!';
 
 
 /********************************* FUNCTIONS *********************************/
@@ -97,7 +97,7 @@ client.on('message', async message => {
     if (commandName === 'setup') return;
 
     // if admin command, get out of here!
-    if (command.admin && message.member.hasPermission('ADMINISTRATOR')) return;
+    if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) return;
 
     // she's a beaut: https://discordjs.guide/command-handling/adding-features.html#expected-command-usage
     // if incorrectly formatted, send strongly worded message

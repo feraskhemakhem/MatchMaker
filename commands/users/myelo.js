@@ -1,4 +1,4 @@
-// js file for the match command
+// js file for the checking elo command
 
 // self-defined helper functions
 const helper = require('../helper.js');

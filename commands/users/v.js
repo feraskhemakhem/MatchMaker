@@ -1,4 +1,4 @@
-// js file for the match command
+// js file for the viewing version command
 
 // info about the node.js project
 const package = require('../../package.json');
