@@ -49,7 +49,7 @@ const prefix = '!';
 // on the bot waking up
 client.on('ready', async () => {
     // set user status
-    client.user.setActivity('!commands for help', {type: 'WATCHING'});
+    client.user.setActivity('!help for help', {type: 'WATCHING'});
 
     if (!your_maker) { // wait for a reference to author's user
         const app = await client.fetchApplication();

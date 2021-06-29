@@ -39,7 +39,7 @@ module.exports = {
         .setFooter(`For further clarifications, please contact ${your_maker.tag}`, your_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
         .setTitle('MatchMaker Commands');
 
-        if (message.member.hasPermission('ADMINISTRATOR') && args.length === 0) {// if mod, have 2 categories
+        if (message.member.hasPermission('ADMINISTRATOR')) {// if mod, have 2 categories
             commands_embed.addField('User Commands', '\u200B' + user_descriptions, true); // only add indent if admin bc otherwise it looks bad
             commands_embed.addField('Admin Commands', admin_descriptions, true);
         }
