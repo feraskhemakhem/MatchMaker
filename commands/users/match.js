@@ -13,7 +13,7 @@ module.exports = {
 	description: 'Begins process of matchmaking with an expected <number of players> (e.g. \"/match 10\"). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking',
 
     // actual command code
-	async execute(message, args, data, client) {
+	async execute(message, args, data) {
         const debug = true;
 
         // extract number of players
@@ -58,7 +58,7 @@ module.exports = {
                     // if bot's ID exists in list, remove (commented out when debugging)
                     if (!debug) {
                         let index_of_my_id;
-                        if ((index_of_my_id = ids.indexOf(client.user.id)) !== -1) {
+                        if ((index_of_my_id = ids.indexOf(message.client.user.id)) !== -1) {
                             ids.splice(index_of_my_id, 1);
                         }
                     }
@@ -83,7 +83,7 @@ module.exports = {
 
 
                     // make the teams
-                    if (!helper.makeTeams(elos, message, client, data.stdev_ratio)) { // if teams aren't made, let them know
+                    if (!helper.makeTeams(elos, message, message.client, data.stdev_ratio)) { // if teams aren't made, let them know
                         message.reply('Unable to make teams with these players. Sorry :(');
                     }
 

@@ -101,7 +101,7 @@ client.on('message', async message => {
 
     // she's a beaut: https://discordjs.guide/command-handling/adding-features.html#expected-command-usage
     // if incorrectly formatted, send strongly worded message
-    if (command.args !== args.length) {
+    if (command.args && command.args !== args.length) {
         let reply = `Error: incorrect number of arguments provided`;
 
         if (command.usage) {
@@ -113,7 +113,7 @@ client.on('message', async message => {
     let returned_value;
 
     try {
-        returned_value = await command.execute(message, args, data, client); // run command with args and database reference
+        returned_value = await command.execute(message, args, data, your_maker); // run command with args and database reference
     } catch (error) { // if there's an error, print it as well as a message in the chat
         console.error(error);
         message.reply('there was an error trying to execute this command :/');
