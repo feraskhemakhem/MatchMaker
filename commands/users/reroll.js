@@ -8,6 +8,7 @@ module.exports = {
 	name: 'reroll',
     args: 0,
     admin: false,
+    public: true,
     usage: '',
     // description of command
 	description: 'Reattempts matchmaking with the same players as the last /match pool. For example, if teams are made with 8 set people, !reroll will make new teams with those exact same people',

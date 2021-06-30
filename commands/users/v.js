@@ -8,6 +8,7 @@ module.exports = {
 	name: 'v',
     args: 0,
     admin: false,
+    public: true,
     usage: '',
     // description of command
 	description: 'Replies with current release version of MatchMaker',

@@ -67,6 +67,7 @@ client.on('ready', async () => {
         // for each file, add the command to client.commands
         for (const file of commandFiles) {
             const command = require(`./commands/${folder}/${file}`);
+            if (!command.public) continue; // if not ready for public use, do not register it
             // key is command name, value is actual command
             client.commands.set(command.name, command);
         }

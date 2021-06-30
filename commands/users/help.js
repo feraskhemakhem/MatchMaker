@@ -11,6 +11,7 @@ module.exports = {
 	name: 'help',
     admin: false,
     usage: '',
+    public: true,
     // description of command
 	description: 'Lists all of commands or info about a specific command.',
 
@@ -25,6 +26,7 @@ module.exports = {
         let user_descriptions = '';
         let admin_descriptions = '\u200B';
         commands.forEach(element => { // if admin, add to admin description, otherwise user desc
+            if (!element.public) continue; // 
             if (element.admin)
                 admin_descriptions = admin_descriptions + `\n\`${element.name}\`\n${element.description}\n`;
             else
@@ -49,7 +51,5 @@ module.exports = {
 
         // send the message
         message.reply({files: [mm_mulan], embed: commands_embed});
-
-        
     },
 };

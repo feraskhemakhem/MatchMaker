@@ -8,6 +8,7 @@ module.exports = {
 	name: 'getelo',
     args: 1,
     admin: false,
+    public: true,
     usage: '<@user>',
     // description of command
 	description: 'Reacts with tagged <@user>\'s elo stored in database',

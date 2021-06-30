@@ -8,6 +8,7 @@ module.exports = {
 	name: 'myelo',
     args: 0,
     admin: false,
+    public: true,
     usage: '',
     // description of command
 	description: 'Reacts with user\'s elo stored in database',

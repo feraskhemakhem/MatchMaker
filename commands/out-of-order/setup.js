@@ -6,8 +6,8 @@ const helper = require('../helper.js');
 module.exports = {
     // command name
 	name: 'setup',
-    args: 1, // TODO: need to signify at least 1 arg, but can be more
     admin: true,
+    public: false,
     usage: '<#channel> <message>',
     // description of command
 	description: 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'/setup #roles "React your elo here"\'). WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED',

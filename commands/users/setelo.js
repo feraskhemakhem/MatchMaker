@@ -8,6 +8,7 @@ module.exports = {
 	name: 'setelo',
     args: 1,
     admin: false,
+    public: true,
     usage: '<elo>',
     // description of command
 	description: 'Sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'/setelo Radiant\')',
