@@ -36,20 +36,23 @@ module.exports = {
         user_descriptions = user_descriptions + `\u200B`;
 
         // create embedded message with necessary information
-        const commands_embed = await helper.templateEmbed();  
-        commands_embed
-        .setFooter(`For further clarifications, please contact ${your_maker.tag}`, your_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
-        .setTitle('MatchMaker Commands');
+        helper.templateEmbed()
+        .then(commands_embed => {  
+            commands_embed
+            .setFooter(`For further clarifications, please contact ${your_maker.tag}`, your_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
+            .setTitle('MatchMaker Commands');
 
-        if (message.member.hasPermission('ADMINISTRATOR')) {// if mod, have 2 categories
-            commands_embed.addField('User Commands', '\u200B' + user_descriptions, true); // only add indent if admin bc otherwise it looks bad
-            commands_embed.addField('Admin Commands', admin_descriptions, true);
-        }
-        else { // no need to subcategorize if not an admin
-            commands_embed.addField('\u200B', user_descriptions);
-        }
+            if (message.member.hasPermission('ADMINISTRATOR')) {// if mod, have 2 categories
+                commands_embed.addField('User Commands', '\u200B' + user_descriptions, true); // only add indent if admin bc otherwise it looks bad
+                commands_embed.addField('Admin Commands', admin_descriptions, true);
+            }
+            else { // no need to subcategorize if not an admin
+                commands_embed.addField('\u200B', user_descriptions);
+            }
 
-        // send the message
-        message.reply({files: [mm_mulan], embed: commands_embed});
+            // send the message
+            message.reply({files: [mm_mulan], embed: commands_embed});
+        });
+        return undefined;
     },
 };

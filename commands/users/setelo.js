@@ -25,7 +25,7 @@ module.exports = {
         let score;
         if ((score = helper.eloToScore(elo)) === -1) { // if -1, then error, so return
             message.reply('Error: problem processing this rank');
-            return;
+            return undefined;
         }
 
         // add data to temp database

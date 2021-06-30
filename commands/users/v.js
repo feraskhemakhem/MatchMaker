@@ -18,5 +18,6 @@ module.exports = {
 	async execute(message, args) {
         // get version from package file
         message.reply(`MatchMaker ${package.version}`);
+        return undefined;
     },
 };
