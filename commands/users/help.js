@@ -44,7 +44,7 @@ module.exports = {
 
             if (message.member.hasPermission('ADMINISTRATOR')) {// if mod, have 2 categories
                 commands_embed.addField('User Commands', '\u200B' + user_descriptions, true); // only add indent if admin bc otherwise it looks bad
-                commands_embed.addField('UR MOM\'S Commands', admin_descriptions, true);
+                commands_embed.addField('Admin Commands', admin_descriptions, true);
             }
             else { // no need to subcategorize if not an admin
                 commands_embed.addField('\u200B', user_descriptions);
