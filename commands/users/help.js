@@ -27,10 +27,13 @@ module.exports = {
         let user_descriptions = '';
         let admin_descriptions = '\u200B';
         commands.forEach(element => { // if admin, add to admin description, otherwise user desc
+            let command_usage = `${prefix}${element.name}`;
+            if (element.usage !== '')
+                command_usage = command_usage + ` ${element.usage}`;
             if (element.admin)
-                admin_descriptions = admin_descriptions + `\n\`${prefix}${element.name}\`\n${element.description}\n`;
+                admin_descriptions = admin_descriptions + `\n\`${command_usage}\`\n${element.description}\n`;
             else
-                user_descriptions = user_descriptions + `\n\`${prefix}${element.name}\`\n${element.description}\n`;
+                user_descriptions = user_descriptions + `\n\`${command_usage}\`\n${element.description}\n`;
         });
         admin_descriptions = admin_descriptions + `\u200B`;
         user_descriptions = user_descriptions + `\u200B`;

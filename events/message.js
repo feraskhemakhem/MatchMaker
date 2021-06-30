@@ -11,7 +11,7 @@ const fs = require('fs');
 module.exports = {
 	name: 'message',
 	async execute(message, client) {
-        const { cooldowns } = client;
+        const { cooldowns, default_cooldown } = client;
         /************************************ preprocessing of arguments ************************************/
         // based on https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments
 
@@ -27,9 +27,6 @@ module.exports = {
         // https://discordjs.guide/command-handling/#dynamically-executing-commands
         if (!client.commands.has(commandName)) return;
         const command = client.commands.get(commandName);
-
-        // make setup function invalid FOR NOW :(
-        if (commandName === 'setup') return;
 
         // if admin command, get out of here!
         if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) return;
@@ -48,7 +45,7 @@ module.exports = {
         // check for appropriate cooldowns
         const now = Date.now();
         const timestamps = cooldowns.get(command.name);
-        const cooldownAmount = (command.cooldown || 3) * 1000; // to milliseconds
+        const cooldownAmount = (command.cooldown || default_cooldown) * 1000; // to milliseconds
 
         // value of each command cooldown is cooldowns > command > user > timestamp
         // if timestamps exist, check it

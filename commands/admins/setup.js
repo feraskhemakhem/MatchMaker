@@ -2,12 +2,13 @@
 
 // self-defined helper functions
 const helper = require('../../helper_functions/helper.js');
+const fs = require('fs');
 
 module.exports = {
     // command name
 	name: 'setup',
     admin: true,
-    public: false,
+    public: true,
     usage: '<#channel> <message>',
     // description of command
 	description: 'Sends setup message of content <message> to <#channel> and prepares reactions for assigning elo. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'/setup #roles "React your elo here"\'). WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED',
@@ -28,7 +29,7 @@ module.exports = {
         
         if (!(setup_message = await helper.setup(message, default_text))) {
             console.log(`ahaha sending setup message failed :)))`);
-            return;
+            return undefined;
         }
 
         // reaction collector for setting elos
@@ -39,7 +40,20 @@ module.exports = {
         elo_collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
             // process elo reaction (this is the hardest line to figure out in all of my code)
-            random_dict[user.id] = helper.processEloReaction(reaction, user);
+            data = require('../../temp/temp_db.json');
+
+            data.player_elos[user.id] = helper.processEloReaction(reaction, user);
+
+            // write to file
+            // write the data received back into the temp database
+            fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
+
+                // Checking for errors
+                if (err) console.log('error storing to database'); 
+            
+                // if you've reached this point, update db successfully
+                console.log('db update complete'); 
+            });
         });
         console.log(`setup message resolved`);
 
@@ -65,5 +79,6 @@ module.exports = {
         }
 
         message.reply(`Setup message sent`); 
+        return undefined;
     },
 };
