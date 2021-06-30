@@ -1,7 +1,6 @@
 // js file for the getting info on all other commands
 
 const helper = require('../../helper_functions/helper.js'); // self-defined helper functions
-const prefix = '/'; // prefix i guess
 const Discord = require('discord.js'); // discord api reference
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
@@ -18,9 +17,10 @@ module.exports = {
 
     
     // actual command code
-	async execute(message, args, data, your_maker) {
+	async execute(message, args, data) {
+
         // get references to commands from client
-        const { commands } = message.client;
+        const { commands, prefix, my_maker } = message.client;
 
         //  add all matchmaker descriptions to two print strings
         // process commands for embed
@@ -28,9 +28,9 @@ module.exports = {
         let admin_descriptions = '\u200B';
         commands.forEach(element => { // if admin, add to admin description, otherwise user desc
             if (element.admin)
-                admin_descriptions = admin_descriptions + `\n\`${element.name}\`\n${element.description}\n`;
+                admin_descriptions = admin_descriptions + `\n\`${prefix}${element.name}\`\n${element.description}\n`;
             else
-                user_descriptions = user_descriptions + `\n\`${element.name}\`\n${element.description}\n`;
+                user_descriptions = user_descriptions + `\n\`${prefix}${element.name}\`\n${element.description}\n`;
         });
         admin_descriptions = admin_descriptions + `\u200B`;
         user_descriptions = user_descriptions + `\u200B`;
@@ -39,7 +39,7 @@ module.exports = {
         helper.templateEmbed()
         .then(commands_embed => {  
             commands_embed
-            .setFooter(`For further clarifications, please contact ${your_maker.tag}`, your_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
+            .setFooter(`For further clarifications, please contact ${my_maker.tag}`, my_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)
             .setTitle('MatchMaker Commands');
 
             if (message.member.hasPermission('ADMINISTRATOR')) {// if mod, have 2 categories

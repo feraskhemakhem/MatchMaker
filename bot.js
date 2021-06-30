@@ -17,147 +17,127 @@ const fs = require('fs');                   //  node.js native file system
 const Discord = require('discord.js');      // discord api reference
 const dotenv = require('dotenv');           // for supporting a .env with secrets
 const client = new Discord.Client();        // for hosting a bot client in discord
-const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
+// const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 client.commands = new Discord.Collection();             // collection of user/admin commands to be stored
 client.cooldowns = new Discord.Collection();            // collection of cooldowns for each command
-const { cooldowns } = client;                           // cooldowns from the client
 
 dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
 
 
 /********************************* GLOBAL VARIABLES *********************************/
 
-// temp fields (to server later)
-const temp_db_name = 
-    './temp/temp_db.json';  // name of temp dababase
-let data = 
-    require(temp_db_name);  // temp database stored in json file
+// // temp fields (to server later)
+// const temp_db_name = 
+//     './temp/temp_db.json';  // name of temp dababase
+// let data = 
+//     require(temp_db_name);  // temp database stored in json file
 
 // for testing
 client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
 
 // for fulltime use
-let your_maker;             // a reference to me :)
-const prefix = '!';         // the prefix for rall commands
+client.prefix = '!';         // the prefix for rall commands
 const default_cooldown = 5; // default cooldown time if none is given
 
 
 /********************************* FUNCTIONS *********************************/
 
-// on the bot waking up
-client.on('ready', async () => {
-    // set user status
-    client.user.setActivity('!help for help', {type: 'WATCHING'});
+// https://discordjs.guide/event-handling/#individual-event-files
+// get all event files
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-    if (!your_maker) { // wait for a reference to author's user
-        const app = await client.fetchApplication();
-        your_maker = app.owner;
-    }
-
-    // processing commands
-    // read all the sub-folders of commands
-    const commandFolders = fs.readdirSync('./commands');
-
-    // for each subfolder, get all the files ending in js
-    for (const folder of commandFolders) {
-        if (folder.endsWith('js')) continue; // if a file and not a folder, skip
-        const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-        // for each file, add the command to client.commands
-        for (const file of commandFiles) {
-            const command = require(`./commands/${folder}/${file}`);
-            if (!command.public && !client.debug) continue; // if not ready for public use, and debug is off
-            // key is command name, value is actual command
-            client.commands.set(command.name, command);
-            // also add cooldowns
-            cooldowns.set(command.name, new Discord.Collection());
-        }
-    }
-
-    console.log(`I'm ready!`);
-});
+// instantiate events from js files in events folder
+for (const file of eventFiles) {
+	const event = require(`./events/${file}`);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args, client));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args, client));
+	}
+}
  
 // constantly running callback for when a message is sent
-client.on('message', async message => {
+// client.on('message', async message => {
 
-    /************************************ preprocessing of arguments ************************************/
-    // based on https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments
+//     /************************************ preprocessing of arguments ************************************/
+//     // based on https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments
 
-    // if command prefix is not found or message comes from bot, ignore it
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+//     // if command prefix is not found or message comes from bot, ignore it
+//     if (!message.content.startsWith(client.prefix) || message.author.bot) return;
 
-    // store arguments and the actual command in variables
-	const args = message.content.slice(prefix.length).trim().split(/ +/); // use regex to split by any # of spaces
-	const commandName = args.shift().toLowerCase();
+//     // store arguments and the actual command in variables
+// 	const args = message.content.slice(client.prefix.length).trim().split(/ +/); // use regex to split by any # of spaces
+// 	const commandName = args.shift().toLowerCase();
 
 
-    /************************************ actual commands ************************************/
-    // https://discordjs.guide/command-handling/#dynamically-executing-commands
-    if (!client.commands.has(commandName)) return;
-    const command = client.commands.get(commandName);
+//     /************************************ actual commands ************************************/
+//     // https://discordjs.guide/command-handling/#dynamically-executing-commands
+//     if (!client.commands.has(commandName)) return;
+//     const command = client.commands.get(commandName);
 
-    // make setup function invalid FOR NOw :(
-    if (commandName === 'setup') return;
+//     // make setup function invalid FOR NOw :(
+//     if (commandName === 'setup') return;
 
-    // if admin command, get out of here!
-    if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) return;
+//     // if admin command, get out of here!
+//     if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) return;
 
-    // she's a beaut: https://discordjs.guide/command-handling/adding-features.html#expected-command-usage
-    // if incorrectly formatted, send strongly worded message
-    if (command.args && command.args !== args.length) {
-        let reply = `Error: incorrect number of arguments provided`;
+//     // she's a beaut: https://discordjs.guide/command-handling/adding-features.html#expected-command-usage
+//     // if incorrectly formatted, send strongly worded message
+//     if (command.args && command.args !== args.length) {
+//         let reply = `Error: incorrect number of arguments provided`;
 
-        if (command.usage) {
-            reply += `\nPlease follow the format: ${prefix}${command.name} ${command.usage}`;
-        }
-        return message.reply(reply);
-    }
+//         if (command.usage) {
+//             reply += `\nPlease follow the format: ${client.prefix}${command.name} ${command.usage}`;
+//         }
+//         return message.reply(reply);
+//     }
 
-    // check for appropriate cooldowns
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3) * 1000; // to milliseconds
+//     // check for appropriate cooldowns
+//     const now = Date.now();
+//     const timestamps = cooldowns.get(command.name);
+//     const cooldownAmount = (command.cooldown || 3) * 1000; // to milliseconds
 
-    // value of each command cooldown is cooldowns > command > user > timestamp
-    // if timestamps exist, check it
-    if (timestamps.has(message.author.id)) {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+//     // value of each command cooldown is cooldowns > command > user > timestamp
+//     // if timestamps exist, check it
+//     if (timestamps.has(message.author.id)) {
+//         const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
-        // if the cooldown is still going, tell them to waits
-        if (now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`please do not spam me; I'm a busy woman. The cooldown for the ${command.name} is ${cooldownAmount / 1000} seconds.`);
-        }
-    }
+//         // if the cooldown is still going, tell them to waits
+//         if (now < expirationTime) {
+//             const timeLeft = (expirationTime - now) / 1000;
+//             return message.reply(`please do not spam me; I'm a busy woman. The cooldown for the ${command.name} is ${cooldownAmount / 1000} seconds.`);
+//         }
+//     }
 
-    // update the timestamps collection for author to be new time
-    timestamps.set(message.author.id, now);
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+//     // update the timestamps collection for author to be new time
+//     timestamps.set(message.author.id, now);
+//     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
-    let returned_value;
+//     let returned_value;
 
-    try {
-        returned_value = await command.execute(message, args, data, your_maker); // run command with args and database reference
-    } catch (error) { // if there's an error, print it as well as a message in the chat
-        console.error(error);
-        message.reply('there was an error trying to execute this command :/');
-    }
+//     try {
+//         returned_value = await command.execute(message, args, data); // run command with args and database reference
+//     } catch (error) { // if there's an error, print it as well as a message in the chat
+//         console.error(error);
+//         message.reply('there was an error trying to execute this command :/');
+//     }
 
-    // console.log(`returned value is ${JSON.stringify(returned_value)}`);
+//     // console.log(`returned value is ${JSON.stringify(returned_value)}`);
 
-    // if returned, update db
-    if (returned_value !== undefined) {
-        data = returned_value;
-        // write the data received back into the temp database
-        fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
+//     // if returned, update db
+//     if (returned_value !== undefined) {
+//         data = returned_value;
+//         // write the data received back into the temp database
+//         fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
         
-            // Checking for errors
-            if (err) console.log('error storing to database'); 
+//             // Checking for errors
+//             if (err) console.log('error storing to database'); 
         
-            // if you've reached this point, update db successfully
-            console.log('db update complete'); 
-        });
-    }
-
+//             // if you've reached this point, update db successfully
+//             console.log('db update complete'); 
+//         });
+//     }
+// });
 
 
 //     if (message.content.startsWith('!match')) {
@@ -443,7 +423,7 @@ client.on('message', async message => {
 
 //         message.reply(`Command name: ${command}\nArguments: ${args}`);
 //     }
-});
+// });
 
  
 
