@@ -9,6 +9,7 @@ module.exports = {
     args: 1,
     admin: false,
     public: true,
+    cooldown: 60,
     usage: '<number of players>',
     // description of command
 	description: 'Begins process of matchmaking with an expected <number of players> (e.g. \"/match 10\"). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking',

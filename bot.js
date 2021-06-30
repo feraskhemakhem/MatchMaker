@@ -21,6 +21,8 @@ const dotenv = require('dotenv');           // for supporting a .env with secret
 const client = new Discord.Client();        // for hosting a bot client in discord
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 client.commands = new Discord.Collection();             // collection of user/admin commands to be stored
+client.cooldowns = new Discord.Collection();            // collection of cooldowns for each command
+const { cooldowns } = client;                           // cooldowns from the client
 
 dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
 
@@ -32,8 +34,6 @@ const temp_db_name =
     './temp/temp_db.json';  // name of temp dababase
 let data = 
     require(temp_db_name);  // temp database stored in json file
-const random_dict = {};     // temp const for testing
-let cached_players = {};    // cached last players (only caches 1 pool across all servers - would have to add to database for multiserver use)
 
 // for testing
 const debug = true;         // BOOLEAN FOR DEBUGGING :DD
@@ -41,7 +41,8 @@ let stdev_ratio = 0.5;      // ratio of stdev to which it is broken. This is a v
 
 // for fulltime use
 let your_maker;             // a reference to me :)
-const prefix = '!';
+const prefix = '!';         // the prefix for rall commands
+const default_cooldown = 5; // default cooldown time if none is given
 
 
 /********************************* FUNCTIONS *********************************/
@@ -67,11 +68,14 @@ client.on('ready', async () => {
         // for each file, add the command to client.commands
         for (const file of commandFiles) {
             const command = require(`./commands/${folder}/${file}`);
-            if (!command.public) continue; // if not ready for public use, do not register it
+            if (!command.public && !debug) continue; // if not ready for public use, and debug is off
             // key is command name, value is actual command
             client.commands.set(command.name, command);
+            // also add cooldowns
+            cooldowns.set(command.name, new Discord.Collection());
         }
     }
+
     console.log(`I'm ready!`);
 });
  
@@ -110,6 +114,27 @@ client.on('message', async message => {
         }
         return message.reply(reply);
     }
+
+    // check for appropriate cooldowns
+    const now = Date.now();
+    const timestamps = cooldowns.get(command.name);
+    const cooldownAmount = (command.cooldown || 3) * 1000; // to milliseconds
+
+    // value of each command cooldown is cooldowns > command > user > timestamp
+    // if timestamps exist, check it
+    if (timestamps.has(message.author.id)) {
+        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+
+        // if the cooldown is still going, tell them to waits
+        if (now < expirationTime) {
+            const timeLeft = (expirationTime - now) / 1000;
+            return message.reply(`please do not spam me; I'm a busy woman. The cooldown for the ${command.name} is ${cooldownAmount / 1000} seconds.`);
+        }
+    }
+
+    // update the timestamps collection for author to be new time
+    timestamps.set(message.author.id, now);
+    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 
     let returned_value;
 

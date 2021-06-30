@@ -9,6 +9,7 @@ module.exports = {
     args: 0,
     admin: false,
     public: true,
+    cooldown: 10,
     usage: '',
     // description of command
 	description: 'Reacts with user\'s elo stored in database',
@@ -21,10 +22,8 @@ module.exports = {
             return;
         }
         // find the emoji we want given guild and elo
-        const emoji = await helper.findValorantEmoji(helper.scoreToElo(data.player_elos[message.author.id]), message.guild);
-
-        // otherwise, calculate rank and react with an emoji for that rank
-        message.react(emoji);
+        const emoji = await helper.findValorantEmoji(helper.scoreToElo(data.player_elos[message.author.id]), message.guild)
+        .then(emoji => message.react(emoji));
 
         return undefined;
     },
