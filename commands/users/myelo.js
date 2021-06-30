@@ -1,7 +1,7 @@
 // js file for the checking elo command
 
 // self-defined helper functions
-const helper = require('../helper.js');
+const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
     // command name
@@ -22,7 +22,7 @@ module.exports = {
             return;
         }
         // find the emoji we want given guild and elo
-        const emoji = await helper.findValorantEmoji(helper.scoreToElo(data.player_elos[message.author.id]), message.guild)
+        helper.findValorantEmoji(helper.scoreToElo(data.player_elos[message.author.id]), message.guild)
         .then(emoji => message.react(emoji));
 
         return undefined;

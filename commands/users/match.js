@@ -1,7 +1,7 @@
 // js file for the match command
 
 // self-defined helper functions
-const helper = require('../helper.js');
+const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
     // command name
@@ -16,7 +16,7 @@ module.exports = {
 
     // actual command code
 	async execute(message, args, data) {
-        const debug = true;
+        const { debug } = message.client.debug;
 
         // extract number of players
         let num_players = parseInt(args[0]);

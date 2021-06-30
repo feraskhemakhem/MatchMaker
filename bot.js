@@ -14,9 +14,7 @@
 /********************************* CONSTS *********************************/
 
 const fs = require('fs');                   //  node.js native file system
-// const package = require('./package.json');  // info about the node.js project
 const Discord = require('discord.js');      // discord api reference
-// const helper = require('./helper.js');      // self defined functions
 const dotenv = require('dotenv');           // for supporting a .env with secrets
 const client = new Discord.Client();        // for hosting a bot client in discord
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
@@ -36,8 +34,7 @@ let data =
     require(temp_db_name);  // temp database stored in json file
 
 // for testing
-const debug = true;         // BOOLEAN FOR DEBUGGING :DD
-let stdev_ratio = 0.5;      // ratio of stdev to which it is broken. This is a variable solely for field testing
+client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
 
 // for fulltime use
 let your_maker;             // a reference to me :)
@@ -68,7 +65,7 @@ client.on('ready', async () => {
         // for each file, add the command to client.commands
         for (const file of commandFiles) {
             const command = require(`./commands/${folder}/${file}`);
-            if (!command.public && !debug) continue; // if not ready for public use, and debug is off
+            if (!command.public && !client.debug) continue; // if not ready for public use, and debug is off
             // key is command name, value is actual command
             client.commands.set(command.name, command);
             // also add cooldowns

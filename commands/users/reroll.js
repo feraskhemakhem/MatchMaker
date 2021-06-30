@@ -1,7 +1,7 @@
 // js file for the reroll match command
 
 // self-defined helper functions
-const helper = require('../helper.js');
+const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
     // command name

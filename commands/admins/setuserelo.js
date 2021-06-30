@@ -1,7 +1,7 @@
 // js file for the setting player elo by username
 
 // self-defined helper functions
-const helper = require('../helper.js');
+const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
     // command name
