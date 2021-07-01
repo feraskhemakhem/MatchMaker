@@ -27,7 +27,7 @@ module.exports = {
         let user_descriptions = '';
         let admin_descriptions = '\u200B';
         commands.forEach(element => { // if admin, add to admin description, otherwise user desc
-            if (!commands.public) return;
+            if (!commands.public) return; // if not public, don't print
             let command_usage = `${prefix}${element.name}`;
             if (element.usage !== '')
                 command_usage = command_usage + ` ${element.usage}`;

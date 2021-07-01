@@ -29,6 +29,8 @@ module.exports = {
         if (!client.commands.has(commandName)) return;
         const command = client.commands.get(commandName);
 
+        if (!command.public && message.author.id !== client.your_maker.id) return; // if not public and I don't ask for it, ignore
+
         // if admin command, get out of here!
         if (command.admin && !message.member.hasPermission('ADMINISTRATOR')) return;
 

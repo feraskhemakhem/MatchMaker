@@ -8,10 +8,25 @@ module.exports = {
 
     async execute(message, args) {
 
-        // for all commands to be deployed
+        // if no args, deploy every command
+        if (!args.length) {
 
-        // https://gist.github.com/advaith1/287e69c3347ef5165c0dbde00aa305d2
-        message.client.api.applications(message.client.user.id).guilds('625862970135805983').commands.post({type: 4, data: data1});
+        }
+        else { // find command given arg name and add it
+            // https://gist.github.com/advaith1/287e69c3347ef5165c0dbde00aa305d2
+
+            // if name is not a command, ignore
+            if (!client.commands.has(args[0])) return;
+
+            // find command reference
+            const command = client.commands.get(args[0]);
+
+            // add command to list of commands
+            message.client.api.applications(message.client.user.id).guilds('625862970135805983').commands.post({data: {
+                name: command.name,
+                description: command.description,
+            }});
+        }
 
         message.reply('command deployed');
 
