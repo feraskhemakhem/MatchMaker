@@ -15,14 +15,13 @@ module.exports = {
         // if no args, deploy every user command
         if (!args.length) {
             // deleting all old commands
+
+            console.log(`deleting old commands...`);
+
             const old_ids = await client.api.applications(client.user.id).guilds('625862970135805983').commands.get();
             old_ids.forEach(old_id => {
                 client.api.applications(client.user.id).guilds('625862970135805983').commands(old_id.id).delete();
             });
-
-            // console.log(`old_ids: ${JSON.stringify(old_ids)}`);
-            // return;
-
 
             console.log(`adding all commands...`);
 
@@ -34,15 +33,15 @@ module.exports = {
                 const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
                 // for each file, add the command to client.commands
                 for (const file of commandFiles) {
-                    console.log(`adding command ${file}`);
                     const command = require(`../${folder}/${file}`);
 
-                    if (!command.public || command.admin) return; // if not for all users, hide
+                    if (!command.public || command.admin) continue; // if not for all users, hide
 
                     let functional_desc = command.description;
                     if (command.description.length < 1 || command.description.length > 100) {
                         functional_desc = command.description.substring(0, command.description.indexOf('.'));
                     }
+                    console.log(`adding command ${file}`);
 
                     // add slash command
                     client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
@@ -60,6 +59,8 @@ module.exports = {
 
             // if name is not a command, ignore
             if (!client.commands.has(args[0])) return;
+
+            if (!command.public || command.admin) return; // if not for all users, hide
 
             // find command reference
             const command = client.commands.get(args[0]);
