@@ -22,8 +22,6 @@ module.exports = {
             return undefined;
 		}
 
-        console.log(`reloading ${command.name}`);
-
         // if found, find the folder and file for this command
         const commandFolders = fs.readdirSync('./commands'); // path relative to bot.js i guess
         const folderName = commandFolders.find(folder => fs.readdirSync(`./commands/${folder}`).includes(`${command.name}.js`));
@@ -38,7 +36,11 @@ module.exports = {
         } catch (error) {
             console.error(error);
             message.channel.send(`There was an error while reloading a command \`${command.name}\`:\n\`${error.message}\`, master :(`);
+            return undefined;
         }
+
+        // clear up the console logs
+        console.log(`\n\n\n\n\n\n\nReloaded ${command.name}:`);
 
         return undefined;
     },

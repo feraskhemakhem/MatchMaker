@@ -24,7 +24,7 @@ This inspiration evolved as Valorant become a popular game in my active Discord 
 
 ### Adding MatchMaker to Your Discord Server
 
-If you want to add this bot a server you're in, ask an admin [or yourself if you are one ;)] to use this link for inviting MatchMaker. [Click this to add the bot to your server :)](https://discord.com/oauth2/authorize?client_id=721167637006123088&scope=bot&permissions=3709861105)
+If you want to add this bot a server you're in, ask an admin [or yourself if you are one ;)] to use this link for inviting MatchMaker. [Click this to add the bot to your server :)](https://discord.com/oauth2/authorize?client_id=721167637006123088&permissions=3709861105&scope=bot%20applications.commands)
 
 ### Once MatchMaker has Joined
 

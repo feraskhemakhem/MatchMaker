@@ -4,13 +4,14 @@
 const temp_db_name = 
     '../temp/temp_db.json';  // name of temp dababase
 const fs = require('fs');   // file system
-const db_helper = require('../../helper_functions/db_helper.js');
+const db_helper = require('../helper_functions/db_helper.js');
 let data = 
     db_helper.readData();   // temp database stored in json file
 
 module.exports = {
 	name: 'message',
 	async execute(message, client) {
+
         const { cooldowns, default_cooldown } = client;
         /************************************ preprocessing of arguments ************************************/
         // based on https://discordjs.guide/creating-your-bot/commands-with-user-input.html#basic-arguments

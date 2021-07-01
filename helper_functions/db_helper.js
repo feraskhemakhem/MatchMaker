@@ -1,6 +1,6 @@
 // this is a helper file for all things related to the database
 
-const database_path = './temp/temp_db.json';
+const database_path = '../temp/temp_db.json';
 const fs = require('fs');
 
 module.exports = {

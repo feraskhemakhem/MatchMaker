@@ -16,10 +16,12 @@ module.exports = {
         // set user status
         client.user.setActivity('!help for help', {type: 'WATCHING'});
 
-        if (!client.my_maker) { // wait for a reference to author's user
-            const app = await client.fetchApplication();
-            client.my_maker = app.owner;
-        }
+        // wait for a reference to author's user
+        const app = await client.fetchApplication();
+        client.my_maker = app.owner;
+
+        // const slash_command = await client.guilds.cache.get('625862970135805983')?.commands.create(data);
+        // console.log(`slash is ${JSON.stringify(slash_command)}`);
     
         // processing commands
         // read all the sub-folders of commands
@@ -39,6 +41,9 @@ module.exports = {
                 cooldowns.set(command.name, new Discord.Collection());
             }
         }
+
+        // register slash commands
+
     
         console.log(`I'm ready!`);
 	},
