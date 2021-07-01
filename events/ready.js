@@ -34,7 +34,6 @@ module.exports = {
             // for each file, add the command to client.commands
             for (const file of commandFiles) {
                 const command = require(`${require_path}/${folder}/${file}`);
-                if (!command.public && !client.debug) continue; // if not ready for public use, and debug is off
                 // key is command name, value is actual command
                 client.commands.set(command.name, command);
                 // also add cooldowns

@@ -8,29 +8,12 @@ module.exports = {
 
     async execute(message, args) {
 
-        // get data from args
-        const data = [
-            {
-                name:'getelo', 
-                description: 'Reacts with tagged <@user>\'s elo stored in database',
-            },
-        ];
+        // for all commands to be deployed
 
-        console.log(`guild id is ${message.guild.id}`);
+        // https://gist.github.com/advaith1/287e69c3347ef5165c0dbde00aa305d2
+        message.client.api.applications(message.client.user.id).guilds('625862970135805983').commands.post({type: 4, data: data1});
 
-        // get command from data        
-        // const cl_app = await message.client.fetchApplication();
+        message.reply('command deployed');
 
-        const cl_app = await message.client.guilds.cache.get('625862970135805983');
-
-        console.log(`guild is ${JSON.stringify(cl_app)}, and is ${cl_app.available} available`);
-        
-        const com = await cl_app.commands;
-
-        console.log(`commands is ${JSON.stringify(com)}`);
-        
-        const command = await com.create(data);
-
-        console.log(`final command is ${JSON.stringify(command)}`);
     },
 };
