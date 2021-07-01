@@ -7,6 +7,7 @@
 // - Make commands slash-based instead of exlcimation-based
 // - Look into SQL Lite and see if it's worth it for this scope
 // - Add stdev command to developers
+// - If deploy has no args, use last used variable
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')

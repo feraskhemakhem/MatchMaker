@@ -1,5 +1,7 @@
 // js file for the getting elo of tagged user
 
+const fs = require('fs');
+
 module.exports = {
     name: 'deploy',
     public: false,
@@ -10,8 +12,47 @@ module.exports = {
 
         const { client } = message;
 
-        // if no args, deploy every command
+        // if no args, deploy every user command
         if (!args.length) {
+            // deleting all old commands
+            const old_ids = await client.api.applications(client.user.id).guilds('625862970135805983').commands.get();
+            old_ids.forEach(old_id => {
+                client.api.applications(client.user.id).guilds('625862970135805983').commands(old_id.id).delete();
+            });
+
+            // console.log(`old_ids: ${JSON.stringify(old_ids)}`);
+            // return;
+
+
+            console.log(`adding all commands...`);
+
+            // iterate through each user 
+            const commandFolders = fs.readdirSync('./commands');
+
+            for (const folder of commandFolders) {
+                if (folder.endsWith('js')) continue; // if a file and not a folder, skip
+                const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+                // for each file, add the command to client.commands
+                for (const file of commandFiles) {
+                    console.log(`adding command ${file}`);
+                    const command = require(`../${folder}/${file}`);
+
+                    if (!command.public || command.admin) return; // if not for all users, hide
+
+                    let functional_desc = command.description;
+                    if (command.description.length < 1 || command.description.length > 100) {
+                        functional_desc = command.description.substring(0, command.description.indexOf('.'));
+                    }
+
+                    // add slash command
+                    client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
+                        name: command.name,
+                        description: functional_desc,
+                    }});
+                }
+            }
+
+            message.reply(`deployed all of the commands!`);
 
         }
         else { // find command given arg name and add it
@@ -23,10 +64,14 @@ module.exports = {
             // find command reference
             const command = client.commands.get(args[0]);
 
+            let functional_desc = command.description;
+            if (command.description.length < 1 || command.description.length > 100) {
+                functional_desc = command.description.substring(0, command.description.indexOf('.'));
+            }
             // add command to list of commands
             client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
                 name: command.name,
-                description: command.description,
+                description: functional_desc,
             }});
 
             message.reply(`command ${args[0]} deployed`);
