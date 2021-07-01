@@ -3,10 +3,10 @@
 // temp fields (to server later)
 const temp_db_name = 
     '../temp/temp_db.json';  // name of temp dababase
+const fs = require('fs');   // file system
+const db_helper = require('../../helper_functions/db_helper.js');
 let data = 
-    require(temp_db_name);  // temp database stored in json file
-
-const fs = require('fs');
+    db_helper.readData();   // temp database stored in json file
 
 module.exports = {
 	name: 'message',
@@ -78,14 +78,7 @@ module.exports = {
         if (returned_value !== undefined) {
             data = returned_value;
             // write the data received back into the temp database
-            fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
-            
-                // Checking for errors
-                if (err) console.log('error storing to database'); 
-            
-                // if you've reached this point, update db successfully
-                console.log('db update complete'); 
-            });
+            db_helper.writeData(data);
         }
 	},
 };

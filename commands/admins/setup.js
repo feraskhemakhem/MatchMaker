@@ -3,6 +3,7 @@
 // self-defined helper functions
 const helper = require('../../helper_functions/helper.js');
 const fs = require('fs');
+const db_helper = require('../../helper_functions/db_helper.js');
 
 module.exports = {
     // command name
@@ -40,20 +41,14 @@ module.exports = {
         elo_collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
             // process elo reaction (this is the hardest line to figure out in all of my code)
-            data = require('../../temp/temp_db.json');
+            const data = db_helper.readData();
 
-            data.player_elos[user.id] = helper.processEloReaction(reaction, user);
+            // add elo to database
+            db_helper.addElo(data, user.id, helper.processEloReaction(reaction, user));
 
             // write to file
             // write the data received back into the temp database
-            fs.writeFile('./temp/temp_db.json', JSON.stringify(data), err => {
-
-                // Checking for errors
-                if (err) console.log('error storing to database'); 
-            
-                // if you've reached this point, update db successfully
-                console.log('db update complete'); 
-            });
+            db_helper.writeData(data);
         });
         console.log(`setup message resolved`);
 
