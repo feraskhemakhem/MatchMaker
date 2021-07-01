@@ -8,6 +8,8 @@ module.exports = {
 
     async execute(message, args) {
 
+        const { client } = message;
+
         // if no args, deploy every command
         if (!args.length) {
 
@@ -22,13 +24,14 @@ module.exports = {
             const command = client.commands.get(args[0]);
 
             // add command to list of commands
-            message.client.api.applications(message.client.user.id).guilds('625862970135805983').commands.post({data: {
+            client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
                 name: command.name,
                 description: command.description,
             }});
+
+            message.reply(`command ${args[0]} deployed`);
         }
 
-        message.reply('command deployed');
-
+        return undefined;
     },
 };
