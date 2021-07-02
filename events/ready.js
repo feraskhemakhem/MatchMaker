@@ -10,11 +10,11 @@ module.exports = {
 	once: true,
 	async execute(client) {
         // cooldowns from the client
-        const { cooldowns } = client;
+        const { cooldowns, prefix } = client;
         const require_path = '../commands';
 
         // set user status
-        client.user.setActivity('!help for help', {type: 'WATCHING'});
+        client.user.setActivity(`${prefix}help for help`, {type: 'WATCHING'});
 
         // wait for a reference to author's user
         const app = await client.fetchApplication();

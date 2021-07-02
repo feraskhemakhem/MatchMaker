@@ -1,8 +1,8 @@
 // js file for the setting player elo by username
 
 // self-defined helper functions
+const { updateEloOnce } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
-const help = require('../users/help.js');
 
 module.exports = {
     // command name
@@ -27,7 +27,7 @@ module.exports = {
     }],
 
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
 
         const _user = message?.mentions?.users?.first();
 
@@ -39,14 +39,13 @@ module.exports = {
         let score;
         if ((score = helper.eloToScore(elo)) === -1) { // if -1, then error, so return
             message.reply(`Error: problem processing this rank. Please follow the format: \"/setuserelo ${this.usage}\"`);
-            return undefined;
+            return;
         }
 
         // add data to temp database
-        data.player_elos[_user.id] = score;
+        updateEloOnce(_user.id, elo);
 
         // send message to confirm score value
         message.reply(`${_user.username}'s rank was registered`);
-        return data;
     },
 };

@@ -1,6 +1,7 @@
 // js file for the reroll match command
 
 // self-defined helper functions
+const { readData } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
@@ -14,7 +15,10 @@ module.exports = {
 	description: 'Reattempts matchmaking with the same players as the last /match pool. For example, if teams are made with 8 set people, !reroll will make new teams with those exact same people',
 
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
+        
+        const data = readData();
+
         if (Object.entries(data.cached_players).length === 0) { // check if cached team is empty
             message.reply('No player lists cached. Please use \"/match <player count>\" instead');
             return;

@@ -1,6 +1,7 @@
 // js file for the match command
 
 // self-defined helper functions
+const { readData, updateCachedPlayers } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
@@ -21,8 +22,9 @@ module.exports = {
     }],
 
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
         const { debug } = message.client.debug;
+        const data = readData();
 
         // extract number of players
         let num_players = parseInt(args[0]);
@@ -77,7 +79,6 @@ module.exports = {
                     // find these ids in the list and make a dictionary of their elos
                     let elos = {};
                     ids.forEach(element => {
-                        console.log(data.player_elos);
                         if (data.player_elos[element]) { // if found, just read it lol
                             elos[element] = data.player_elos[element];
                         }
@@ -96,7 +97,7 @@ module.exports = {
                     }
 
                     // cache last set of players used
-                    data.cached_players = ids;
+                    updateCachedPlayers(ids);
                     
                 })
                 .catch(collected => { 
@@ -106,6 +107,5 @@ module.exports = {
         } catch (error) {
             console.log('Error replying and reacting');
         }
-        return data; // return for new cached players db update
     },
 };

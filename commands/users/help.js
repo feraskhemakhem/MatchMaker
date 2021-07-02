@@ -1,6 +1,6 @@
 // js file for the getting info on all other commands
 
-const helper = require('../../helper_functions/helper.js'); // self-defined helper functions
+const { templateEmbed } = require('../../helper_functions/helper.js'); // self-defined helper functions
 const Discord = require('discord.js'); // discord api reference
 const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
@@ -22,7 +22,7 @@ module.exports = {
 
     
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
 
         // get references to commands from client
         const { commands, prefix, my_maker } = message.client;
@@ -67,7 +67,7 @@ module.exports = {
                 user_descriptions = user_descriptions + `\u200B`;
 
                 // create embedded message with necessary information
-                helper.templateEmbed()
+                templateEmbed()
                 .then(commands_embed => {  
                     commands_embed
                     .setFooter(`For further clarifications, please contact ${my_maker.tag}`, my_maker.displayAvatarURL({size: 16})) // add a little photo of my avatar if it can :)

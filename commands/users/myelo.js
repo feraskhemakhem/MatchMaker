@@ -1,6 +1,7 @@
 // js file for the checking elo command
 
 // self-defined helper functions
+const { readData } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
@@ -13,8 +14,11 @@ module.exports = {
 	description: 'Reacts with user\'s elo stored in database',
 
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
         console.log(`/myelo by ${message.author.id}`);
+
+        const data = readData();
+
         if (!data.player_elos[message.author.id]) { // if rank doesnt exists, print it
             message.react('🚫');
             return;

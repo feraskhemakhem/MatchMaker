@@ -21,7 +21,7 @@ module.exports = {
     }],
 
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
 
         const user_id = message.author.id;
         const elo = args[0].charAt(0).toUpperCase() + args[0].slice(1); // make first letter uppercase of first arg
@@ -36,10 +36,9 @@ module.exports = {
         }
 
         // add data to temp database
-        data.player_elos[user_id] = score;
+        addEloOnce(user_id, score);
 
         // send message to confirm score value
         message.reply(`your rank was registered`);
-        return data;
     },
 };

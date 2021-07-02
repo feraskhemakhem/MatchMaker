@@ -2,8 +2,7 @@
 
 // self-defined helper functions
 const helper = require('../../helper_functions/helper.js');
-const fs = require('fs');
-const db_helper = require('../../helper_functions/db_helper.js');
+const { updateEloOnce } = require('../../helper_functions/db_helper.js');
 
 module.exports = {
     // command name
@@ -34,7 +33,7 @@ module.exports = {
         // make sure server is available, suggested by documentation
         if (!message.guild.available) {
             console.log(`Guild not available for setup`);
-            return undefined;
+            return;
         }
 
         const default_text = 'Please choose your rank by selecting the reaction that corresponds to it.';
@@ -42,7 +41,7 @@ module.exports = {
         
         if (!(setup_message = await helper.setup(message, default_text))) {
             console.log(`ahaha sending setup message failed :)))`);
-            return undefined;
+            return;
         }
 
         // reaction collector for setting elos
@@ -53,14 +52,9 @@ module.exports = {
         elo_collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
             // process elo reaction (this is the hardest line to figure out in all of my code)
-            const data = db_helper.readData();
 
             // add elo to database
-            db_helper.addElo(data, user.id, helper.processEloReaction(reaction, user));
-
-            // write to file
-            // write the data received back into the temp database
-            db_helper.writeData(data);
+            updateEloOnce(user.id, helper.processEloReaction(reaction, user));
         });
         console.log(`setup message resolved`);
 
@@ -86,6 +80,6 @@ module.exports = {
         }
 
         message.reply(`Setup message sent`); 
-        return undefined;
+        return;
     },
 };

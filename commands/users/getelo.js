@@ -1,6 +1,7 @@
 // js file for the getting elo of tagged user
 
 // self-defined helper functions
+const { readData } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
@@ -22,7 +23,7 @@ module.exports = {
 
 
     // actual command code
-	async execute(message, args, data) {
+	async execute(message, args) {
 
         let user_id = message.author.id;
 
@@ -31,6 +32,8 @@ module.exports = {
             user_id = message.mentions.users.first().id;
 
         console.log(`/getelo of ${user_id}`);
+
+        const data = readData();
 
         if (!data.player_elos[user_id]) { // if rank doesnt exists, print it
             message.react('🚫');

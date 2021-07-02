@@ -1,8 +1,7 @@
 // js file for setting stdev_ratio value for testing
 
 // filesystem reference
-const fs = require('fs');
-const db_helper = require('../../helper_functions/db_helper.js');
+const { updateStdevOnce } = require('../../helper_functions/db_helper.js');
 
 module.exports = {
     name: 'stdev_ratio',
@@ -23,8 +22,9 @@ module.exports = {
                 message.reply('please respond with an appropriate ratio value');
                 return;
             }
-            data.stdev_ratio = new_ratio;
-            db_helper.writeData(data);
+
+            // actually update ratio in database
+            updateStdevOnce(new_ratio);
 
             message.reply(`stdev ratio changed to ${new_ratio}`);
         }
