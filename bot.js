@@ -7,7 +7,7 @@
 // - (DONE) Make commands slash-based instead of exlcimation-based
 // - Look into SQL Lite and see if it's worth it for this scope
 // - (DONE) Add stdev command to developers
-// - If deploy has no args, use last used variable
+// - (DONE) If deploy/reload has no args, use last used command name
 // - Update readme to include information of what files are what
 // - Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
 // - Make database readings within the function instead of outside function

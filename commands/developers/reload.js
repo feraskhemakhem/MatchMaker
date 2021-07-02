@@ -6,7 +6,6 @@ let last_command;
 
 module.exports = {
     name: 'reload',
-    args: 1,
     cooldown: 3,
     public: false,
     usage: '<command>',
@@ -14,7 +13,7 @@ module.exports = {
 
     async execute(message, args) {
 
-        const commandName;
+        let commandName;
         // use cache
         if (!args.length) {
             if (!last_command) return;
