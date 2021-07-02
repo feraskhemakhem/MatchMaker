@@ -2,6 +2,7 @@
 
 // filesystem reference
 const fs = require('fs');
+let last_command;
 
 module.exports = {
     name: 'reload',
@@ -12,8 +13,19 @@ module.exports = {
     description: 'reloads <command>',
 
     async execute(message, args) {
+
+        const commandName;
+        // use cache
+        if (!args.length) {
+            if (!last_command) return;
+
+            commandName = last_command;
+        }
+
         // get command from args
-        const commandName = args[0].toLowerCase();
+        else {
+            commandName = args[0].toLowerCase();
+        }
 		const command = message.client.commands.get(commandName);
 
         // if not found, provide message
@@ -21,6 +33,8 @@ module.exports = {
 			message.reply(`There is no command with a name \`${commandName}\`, master`);
             return undefined;
 		}
+
+        last_command = commandName;
 
         // if found, find the folder and file for this command
         const commandFolders = fs.readdirSync('./commands'); // path relative to bot.js i guess
