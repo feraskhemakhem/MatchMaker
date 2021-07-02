@@ -3,8 +3,8 @@
 //         - make setting elo reaction-based
 
 // For v3.0:
-// - Make code more efficient / argument based
-// - Make commands slash-based instead of exlcimation-based
+// - (DONE) Make code more efficient / argument based
+// - (DONE) Make commands slash-based instead of exlcimation-based
 // - Look into SQL Lite and see if it's worth it for this scope
 // - Add stdev command to developers
 // - If deploy has no args, use last used variable
@@ -33,7 +33,7 @@ dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-v
 client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
 
 // for fulltime use
-client.prefix = '!';         // the prefix for rall commands
+client.prefix = '/';         // the prefix for rall commands
 client.default_cooldown = 5; // default cooldown time if none is given
 
 
