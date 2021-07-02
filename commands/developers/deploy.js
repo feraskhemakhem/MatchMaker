@@ -5,7 +5,6 @@ const fs = require('fs');
 module.exports = {
     name: 'deploy',
     public: false,
-    usage: '',
     cooldown: 0.5,
     description: 'deploys slash commands',
 

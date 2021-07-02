@@ -378,5 +378,19 @@ module.exports = {
         this.printTeams(t1_string, t2_string, team_ad_string, message.channel);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
+    },
+    // function for getting option choices for elos
+    // parameters: N/A
+    // prints: N/A
+    // returns: choices for the elo option
+    getEloChoices: function() {
+
+        choices = [];
+        // add each rank to choices array
+        for (const rank of ranks) {
+            choices.push({name: rank, value: rank});
+        }
+
+        return choices;
     }
 };

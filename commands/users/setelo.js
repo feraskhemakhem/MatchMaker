@@ -17,20 +17,7 @@ module.exports = {
         type: 3, // string
         description: 'The elo/rank to set self to',
         required: true,
-        // choices: [
-        //     {
-        //         name: 'Iron',
-        //         value: 'Iron',
-        //     },
-        //     {
-        //         name: 'Bronze',
-        //         value: 'Bronze',
-        //     },
-        //     {
-        //         name: 'Silver',
-        //         value: 'Silver',
-        //     },
-        // ],
+        choices: helper.getEloChoices(),
     }],
 
     // actual command code
