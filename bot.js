@@ -9,6 +9,7 @@
 // - Add stdev command to developers
 // - If deploy has no args, use last used variable
 // - Update readme to include information of what files are what
+// - Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')

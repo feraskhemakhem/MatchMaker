@@ -13,6 +13,12 @@ module.exports = {
     usage: '<number of players>',
     // description of command
 	description: 'Begins process of matchmaking with an expected <number of players> (e.g. \"/match 10\"). The MatchMaker will ask for a reaction from all player to be included, starting the processing of matchmaking',
+    options: [{
+        name: 'num_players',
+        type: 3, // string
+        description: 'number of players playing in the match',
+        required: true,
+    }],
 
     // actual command code
 	async execute(message, args, data) {

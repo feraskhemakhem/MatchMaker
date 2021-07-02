@@ -11,6 +11,18 @@ module.exports = {
     usage: '<@user> <elo>',
     // description of command
 	description: '!Sets the elo of <@user> to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'/setuserelo @cherry_blossom gold\')',
+    options: [{
+        name: 'user',
+        type: 6, // user
+        description: 'user you want to set elo of',
+        required: true,
+    },
+    {
+        name: 'elo',
+        type: 3, // string
+        description: 'elo to set user to',
+        required: true,
+    }],
 
     // actual command code
 	async execute(message, args, data) {

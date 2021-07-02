@@ -6,6 +6,7 @@ module.exports = {
     name: 'deploy',
     public: false,
     usage: '',
+    cooldown: 0.5,
     description: 'deploys slash commands',
 
     async execute(message, args) {
@@ -47,6 +48,7 @@ module.exports = {
                     client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
                         name: command.name,
                         description: functional_desc,
+                        options: command.options,
                     }});
                 }
             }
@@ -60,10 +62,10 @@ module.exports = {
             // if name is not a command, ignore
             if (!client.commands.has(args[0])) return;
 
-            if (!command.public || command.admin) return; // if not for all users, hide
-
             // find command reference
             const command = client.commands.get(args[0]);
+
+            if (!command.public || command.admin) return; // if not for all users, hide
 
             let functional_desc = command.description;
             if (command.description.length < 1 || command.description.length > 100) {
@@ -73,6 +75,7 @@ module.exports = {
             client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
                 name: command.name,
                 description: functional_desc,
+                options: command.options,
             }});
 
             message.reply(`command ${args[0]} deployed`);

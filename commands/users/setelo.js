@@ -12,6 +12,26 @@ module.exports = {
     usage: '<elo>',
     // description of command
 	description: 'Sets the elo of user to <elo>. <elo> is a string which supports capitalisation and lowercase (e.g. \'/setelo Radiant\')',
+    options: [{
+        name: 'elo',
+        type: 3, // string
+        description: 'The elo/rank to set self to',
+        required: true,
+        // choices: [
+        //     {
+        //         name: 'Iron',
+        //         value: 'Iron',
+        //     },
+        //     {
+        //         name: 'Bronze',
+        //         value: 'Bronze',
+        //     },
+        //     {
+        //         name: 'Silver',
+        //         value: 'Silver',
+        //     },
+        // ],
+    }],
 
     // actual command code
 	async execute(message, args, data) {

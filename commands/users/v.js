@@ -10,7 +10,6 @@ module.exports = {
     admin: false,
     public: true,
     cooldown: 5,
-    usage: '',
     // description of command
 	description: 'Replies with current release version of MatchMaker',
 

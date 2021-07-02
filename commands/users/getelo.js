@@ -6,21 +6,31 @@ const helper = require('../../helper_functions/helper.js');
 module.exports = {
     // command name
 	name: 'getelo',
-    args: 1,
+    args: 0,
     admin: false,
     cooldown: 3,
     public: true,
     usage: '<@user>',
     // description of command
 	description: 'Reacts with tagged <@user>\'s elo stored in database',
+    options: [{
+        name: 'user',
+        type: 6, // user
+        description: 'user you want to see elo of (self by default)',
+        required: false,
+    }],
+
 
     // actual command code
 	async execute(message, args, data) {
 
-        // get id from username
-        const user_id = message.mentions.users.first().id;
+        let user_id = message.author.id;
 
-        console.log(`/getelo of ${message.mentions.users.first().username}`);
+        // get id from username if arg is given
+        if (args.length)
+            user_id = message.mentions.users.first().id;
+
+        console.log(`/getelo of ${user_id}`);
 
         if (!data.player_elos[user_id]) { // if rank doesnt exists, print it
             message.react('🚫');

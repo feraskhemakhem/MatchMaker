@@ -10,7 +10,6 @@ module.exports = {
     admin: false,
     public: true,
     cooldown: 10,
-    usage: '',
     // description of command
 	description: 'Reacts with user\'s elo stored in database',
 

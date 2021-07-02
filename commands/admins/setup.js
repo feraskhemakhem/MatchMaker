@@ -13,6 +13,18 @@ module.exports = {
     usage: '<#channel> <message>',
     // description of command
 	description: 'Sends setup message of content <message> to <#channel> and prepares reactions for elo assigning. Message is optional, with default message as stand-in. Quotes around message are also optional (e.g. \'/setup #roles "React your elo here"\'). WARNING: THIS COMMAND SHOULD ONLY BE USED ONCE, UNLESS THE PREVIOUS MESSAGE IS DELETED',
+    options: [{
+        name: 'target_channel',
+        type: 7, // channel
+        description: 'channel to post setup message in',
+        required: false,
+    },
+    {
+        name: 'post_message',
+        type: 3, // string
+        description: 'message to be included in post',
+        required: false,
+    }],
 
     // actual command code
 	async execute(message, args, data) {
