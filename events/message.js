@@ -1,12 +1,7 @@
 // module for message event of client
 
 // temp fields (to server later)
-const temp_db_name = 
-    '../temp/temp_db.json';  // name of temp dababase
-const fs = require('fs');   // file system
 const db_helper = require('../helper_functions/db_helper.js');
-let data = 
-    db_helper.readData();   // temp database stored in json file
 
 module.exports = {
 	name: 'message',
@@ -69,19 +64,10 @@ module.exports = {
         let returned_value;
 
         try {
-            returned_value = await command.execute(message, args, data); // run command with args and database reference
+            command.execute(message, args); // run command with args and database reference
         } catch (error) { // if there's an error, print it as well as a message in the chat
             console.error(error);
             message.reply('there was an error trying to execute this command :/');
-        }
-
-        // console.log(`returned value is ${JSON.stringify(returned_value)}`);
-
-        // if returned, update db
-        if (returned_value !== undefined) {
-            data = returned_value;
-            // write the data received back into the temp database
-            db_helper.writeData(data);
         }
 	},
 };
