@@ -6,7 +6,6 @@ const helper = require('../../helper_functions/helper.js');
 module.exports = {
     // command name
 	name: 'myelo',
-    args: 0,
     admin: false,
     public: true,
     cooldown: 10,

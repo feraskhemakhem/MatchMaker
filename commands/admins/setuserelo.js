@@ -2,6 +2,7 @@
 
 // self-defined helper functions
 const helper = require('../../helper_functions/helper.js');
+const help = require('../users/help.js');
 
 module.exports = {
     // command name
@@ -22,6 +23,7 @@ module.exports = {
         type: 3, // string
         description: 'elo to set user to',
         required: true,
+        choices: helper.getEloChoices(),
     }],
 
     // actual command code
