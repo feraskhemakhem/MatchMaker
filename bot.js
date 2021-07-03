@@ -8,12 +8,13 @@
 // - Look into SQL Lite and see if it's worth it for this scope
 // - (DONE) Add stdev command to developers
 // - (DONE) If deploy/reload has no args, use last used command name
-// - Make database readings within the function instead of outside function
+// - (DONE) Make database readings within the function instead of outside function
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
 // - Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
 // - Update readme to include information of what files are what
+// - Add interaction optimization
 
 
 /********************************* CONSTS *********************************/

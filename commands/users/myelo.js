@@ -12,9 +12,28 @@ module.exports = {
     cooldown: 10,
     // description of command
 	description: 'Reacts with user\'s elo stored in database',
+    options: [{
+        name: 'elo',
+        description: 'get or set the elo of the user',
+        type: 2, // sub command group
+        options: [
+            {
+                name: 'get',
+                description: 'retrieve the elo of the user',
+                type: 1 // sub command
+            },
+            {
+                name: 'set',
+                description: 'update the elo of user',
+                type: 1 // sub command
+            }
+        ]
+    }],
 
     // actual command code
 	async execute(message, args) {
+        if (args.length)
+            console.log(`arg is ${args[0]}`);
         console.log(`/myelo by ${message.author.id}`);
 
         const data = readData();
