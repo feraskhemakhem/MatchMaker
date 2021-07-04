@@ -15,6 +15,7 @@
 // - Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
 // - Update readme to include information of what files are what
 // - Add interaction optimization
+// - Add permissions for setup function
 
 
 /********************************* CONSTS *********************************/
@@ -35,7 +36,7 @@ dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-v
 client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
 
 // for fulltime use
-client.prefix = '/';         // the prefix for rall commands
+client.prefix = '!';         // the prefix for rall commands
 client.default_cooldown = 5; // default cooldown time if none is given
 
 

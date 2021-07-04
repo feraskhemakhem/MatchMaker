@@ -1,7 +1,7 @@
 // js file for setting stdev_ratio value for testing
 
 // filesystem reference
-const { updateStdevOnce } = require('../../helper_functions/db_helper.js');
+const { readData, updateStdevOnce } = require('../../helper_functions/db_helper.js');
 
 module.exports = {
     name: 'stdev_ratio',
@@ -12,7 +12,7 @@ module.exports = {
 
     async execute(message, args) {
         // read old stdev_ratio
-        const data = db_helper.readData();
+        const data = readData();
 
         // if arg given, change to this arg
         if (args.length) {

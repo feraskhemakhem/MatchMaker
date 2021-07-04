@@ -30,7 +30,7 @@ module.exports = {
         return data;
     },
     // function for adding a single elo
-    updateEloOnce: function (stdev_ratio) {
+    updateEloOnce: function (user_id, elo) {
         // read and update data
         const data = readData();
         data.player_elos[user_id] = elo;

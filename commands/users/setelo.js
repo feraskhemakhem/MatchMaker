@@ -1,6 +1,7 @@
 // js file for the setting elo command
 
 // self-defined helper functions
+const { updateEloOnce } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
@@ -36,7 +37,7 @@ module.exports = {
         }
 
         // add data to temp database
-        addEloOnce(user_id, score);
+        updateEloOnce(user_id, score);
 
         // send message to confirm score value
         message.reply(`your rank was registered`);
