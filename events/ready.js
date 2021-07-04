@@ -30,6 +30,7 @@ module.exports = {
         // for each subfolder, get all the files ending in js
         for (const folder of commandFolders) {
             if (folder.endsWith('js')) continue; // if a file and not a folder, skip
+            // if (folder === 'legacy_commands') continue; // if legacy commands, ignore
             const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
             // for each file, add the command to client.commands
             for (const file of commandFiles) {

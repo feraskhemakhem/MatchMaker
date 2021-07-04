@@ -58,36 +58,35 @@ module.exports = {
 
                 console.log(`adding all commands...`);
 
-                // iterate through each user 
-                const commandFolders = fs.readdirSync('./commands');
-
-                for (const folder of commandFolders) {
-                    if (folder.endsWith('js')) continue; // if a file and not a folder, skip
-                    const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-                    // for each file, add the command to client.commands
-                    for (const file of commandFiles) {
-                        const command = require(`../${folder}/${file}`);
-
-                        if (!command.public || command.admin) continue; // if not for all users, hide
-
-                        let functional_desc = command.description;
-                        if (command.description.length < 1 || command.description.length > 100) {
-                            functional_desc = command.description.substring(0, command.description.indexOf('.'));
-                        }
-                        console.log(`adding command ${file}`);
-
-                        // add slash command
-                        client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
-                            name: command.name,
-                            description: functional_desc,
-                            options: command.options,
-                        }});
+                // iterate through existing commands
+                for (const [commandName, command] of client.commands) {
+                    if (command.admin || !command.public) continue;
+                    // only access up to first 100 characters of description if applicable
+                    let functional_desc = command.description;
+                    if (command.description.length < 1 || command.description.length > 100) {
+                        functional_desc = command.description.substring(0, command.description.indexOf('.'));
                     }
+                    console.log(`adding command ${commandName}`);
+
+                    // add slash command
+                    client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
+                        name: command.name,
+                        description: functional_desc,
+                        options: command.options,
+                    }});
                 }
 
                 message.reply(`deployed all of the commands!`);
             }
-            
+            else if (args[0].toLowerCase() === 'clear') {
+                console.log(`deleting old commands...`);
+
+                const old_ids = await client.api.applications(client.user.id).guilds('625862970135805983').commands.get();
+                old_ids.forEach(old_id => {
+                    client.api.applications(client.user.id).guilds('625862970135805983').commands(old_id.id).delete();
+                });
+                console.log(`done`);
+            }
             // if specific command, deploy that command
             else {
             
@@ -118,7 +117,5 @@ module.exports = {
                 message.reply(`command ${args[0]} deployed`);
             }
         }
-
-        return undefined;
     },
 };

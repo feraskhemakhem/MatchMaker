@@ -12,10 +12,14 @@
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
-// - Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
+// - (DONE) Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
 // - Update readme to include information of what files are what
 // - Add interaction optimization
 // - Add permissions for setup function
+
+// v4.0:
+// - Investigate whether patching commands is better than deleting then adding the same commands
+// - WHENEVER IT COMES OUT, UPDATE INTERACTIONS TO WORK WITH DISCORDJS INSTEAD OF USING REST API
 
 
 /********************************* CONSTS *********************************/
@@ -36,7 +40,7 @@ dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-v
 client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
 
 // for fulltime use
-client.prefix = '!';         // the prefix for rall commands
+client.prefix = '/';         // the prefix for rall commands
 client.default_cooldown = 5; // default cooldown time if none is given
 
 
@@ -48,13 +52,21 @@ const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'
 
 // instantiate events from js files in events folder
 for (const file of eventFiles) {
+	if (file === 'message.js') continue; // skip message callback for now
 	const event = require(`./events/${file}`);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args, client));
-	} else {
+	} else if (event.ws) { // DO NOT SPREAD INTERACTION_CREATE
+		client.ws.on(event.name, args => event.execute(args, client));
+	}
+	else {
 		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }
+
+// client.on('INTERACTION_CREATE', async interaction => {
+// 	console.log(`interaction`);
+// });
 
 // THIS  MUST  BE  THIS  WAY
 client.login(process.env.BOT_TOKEN); //BOT_TOKEN is the Client Secret
