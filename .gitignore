@@ -284,3 +284,6 @@ tmp/
 temp/
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+
+# Any legacy folders
+commands/legacy_commands/
