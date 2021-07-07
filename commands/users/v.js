@@ -1,6 +1,7 @@
 // js file for the viewing version command
 
 // info about the node.js project
+const { reply } = require('../../helper_functions/event_helper.js');
 const package = require('../../package.json');
 
 module.exports = {
@@ -14,9 +15,8 @@ module.exports = {
 	description: 'Replies with current release version of MatchMaker',
 
     // actual command code
-	async execute(message, args) {
+	async execute(interaction, args, client) {
         // get version from package file
-        message.reply(`MatchMaker ${package.version}`);
-        return undefined;
+        reply(client, interaction, `MatchMaker ${package.version}`);
     },
 };

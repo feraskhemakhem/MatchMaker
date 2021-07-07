@@ -26,21 +26,26 @@ module.exports = {
         // processing commands
         // read all the sub-folders of commands
         const commandFolders = fs.readdirSync('./commands');
+
+        // add just /v for now
+        const command = require('../commands/users/v.js');
+        client.commands.set(command.name, command);
+        cooldowns.set(command.name, new Discord.Collection());
     
-        // for each subfolder, get all the files ending in js
-        for (const folder of commandFolders) {
-            if (folder.endsWith('js')) continue; // if a file and not a folder, skip
-            // if (folder === 'legacy_commands') continue; // if legacy commands, ignore
-            const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-            // for each file, add the command to client.commands
-            for (const file of commandFiles) {
-                const command = require(`${require_path}/${folder}/${file}`);
-                // key is command name, value is actual command
-                client.commands.set(command.name, command);
-                // also add cooldowns
-                cooldowns.set(command.name, new Discord.Collection());
-            }
-        }
+        // // for each subfolder, get all the files ending in js
+        // for (const folder of commandFolders) {
+        //     if (folder.endsWith('js')) continue; // if a file and not a folder, skip
+        //     // if (folder === 'legacy_commands') continue; // if legacy commands, ignore
+        //     const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+        //     // for each file, add the command to client.commands
+        //     for (const file of commandFiles) {
+        //         const command = require(`${require_path}/${folder}/${file}`);
+        //         // key is command name, value is actual command
+        //         client.commands.set(command.name, command);
+        //         // also add cooldowns
+        //         cooldowns.set(command.name, new Discord.Collection());
+        //     }
+        // }
 
         // register slash commands
 

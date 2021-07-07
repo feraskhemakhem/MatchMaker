@@ -1,24 +1,6 @@
-// module for ready event of client
+// module for interaction event of client
 
-
-const reply = async (client, interaction, response) => {
-        let data = {
-                content: response,
-        };
-
-        // check for embeds
-        if (typeof response === 'object') {
-                data = await createAPIMessage(interaction, response);
-        }
-
-        //  reply? TODO: since discord.js doesnt natively support it yet, doing it ugly
-        client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-                        data: data,
-                }
-        });
-};
+const { reply } = require('../helper_functions/event_helper.js');
 
 module.exports = {
         // AYYO DICSORD JS GUIDE KINDA SUS GOTTA USE REST API
@@ -31,7 +13,8 @@ module.exports = {
                 // print the command
                 console.log(commandName);
                 // reply(client, interaction, 'pog?');
-                console.log(`opts are ${JSON.stringify(options[0])}`);
+                if (options)
+                        console.log(`options[0] are ${JSON.stringify(options[0])}`);
 
                 // process this message
                 const args = [];
@@ -43,8 +26,9 @@ module.exports = {
                         }
                 }
 
-                reply(client, interaction, 'ok');
+                // reply(client, interaction, 'ok');
                 console.log(`interaction: ${JSON.stringify(interaction)}`);
+                console.log(`\n\n\n\n\n\n\n\n\n${JSON.stringify(interaction.message)}`);
 
                 const { cooldowns, default_cooldown } = client;
                 /************************************ preprocessing of arguments ************************************/
@@ -71,7 +55,7 @@ module.exports = {
                         if (command.usage) {
                                 reply += `\nPlease follow the format: ${client.prefix}${command.name} ${command.usage}`;
                         }
-                        return message.reply(reply);
+                        return (client, interaction, reply);
                 }
 
                 // check for appropriate cooldowns
@@ -82,7 +66,7 @@ module.exports = {
                 // value of each command cooldown is cooldowns > command > user > timestamp
                 // if timestamps exist, check it
                 if (timestamps.has(interaction.member.id)) {
-                        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
+                        const expirationTime = timestamps.get(interaction.member.id) + cooldownAmount;
 
                         // if the cooldown is still going, tell them to waits
                         if (now < expirationTime) {
@@ -92,12 +76,12 @@ module.exports = {
                 }
 
                 // update the timestamps collection for author to be new time
-                timestamps.set(message.author.id, now);
-                setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+                timestamps.set(interaction.member.id, now);
+                setTimeout(() => timestamps.delete(interaction.member.id), cooldownAmount);
 
 
                 try {
-                        command.execute(message, args); // run command with args and database reference
+                        command.execute(interaction, args, client); // run command with args and database reference
                 } catch (error) { // if there's an error, print it as well as a message in the chat
                         console.error(error);
                         reply(client, interaction, 'there was an error trying to execute this command :/');
