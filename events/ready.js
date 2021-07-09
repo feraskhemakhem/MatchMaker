@@ -28,9 +28,13 @@ module.exports = {
         const commandFolders = fs.readdirSync('./commands');
 
         // add just /v for now
-        const command = require('../commands/users/v.js');
-        client.commands.set(command.name, command);
-        cooldowns.set(command.name, new Discord.Collection());
+        const working_functions = ['v', 'help', 'reroll', 'match'];
+        for (const w of working_functions) {
+                const command = require(`../commands/users/${w}.js`);
+                client.commands.set(command.name, command);
+                cooldowns.set(command.name, new Discord.Collection());
+        }
+
     
         // // for each subfolder, get all the files ending in js
         // for (const folder of commandFolders) {

@@ -28,7 +28,7 @@ module.exports = {
 
                 // reply(client, interaction, 'ok');
                 console.log(`interaction: ${JSON.stringify(interaction)}`);
-                console.log(`\n\n\n\n\n\n\n\n\n${JSON.stringify(interaction.message)}`);
+                console.log(`\n\n\n\n\n\n\n\n\n`); // ${JSON.stringify(interaction.message)}`);
 
                 const { cooldowns, default_cooldown } = client;
                 /************************************ preprocessing of arguments ************************************/

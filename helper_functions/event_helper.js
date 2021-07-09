@@ -23,7 +23,7 @@ module.exports = {
                 }
         });
 
-        const app = client.fetchApplication();
+        // GET THE ORIGINAL RESPONSE MESSAGE
         const reply = await client.api.webhooks(client.user.id, interaction.token).messages('@original').get();
 
         console.log(`reply sent for response: ${response} and ${typeof{reply}}, ${JSON.stringify(reply)}`);
