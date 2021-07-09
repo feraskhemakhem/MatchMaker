@@ -1,4 +1,4 @@
-# MatchMaker
+# MatchMaker v2.6.0
 
 A discord bot that creates rank-based teams from a pool of players.
 
