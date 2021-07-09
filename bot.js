@@ -16,6 +16,7 @@
 // - Update readme to include information of what files are what
 // - Add interaction optimization
 // - Add permissions for setup function
+// - Add preprocessor code for readme to make version and command details automatic
 
 // v4.0:
 // - Investigate whether patching commands is better than deleting then adding the same commands
