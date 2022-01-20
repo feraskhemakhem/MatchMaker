@@ -6,7 +6,6 @@ const { updateEloOnce } = require('../../helper_functions/db_helper.js');
 
 module.exports = {
     // command name
-    // test
 	name: 'setup',
     admin: true,
     public: true,
