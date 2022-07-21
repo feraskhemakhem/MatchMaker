@@ -17,6 +17,7 @@
 // - Add interaction optimization
 // - Add permissions for setup function
 // - Add preprocessor code for readme to make version and command details automatic
+// - Add oppourtunity for automatic registration of players from a voice channel (e.g. '-vc')
 
 // v4.0:
 // - Investigate whether patching commands is better than deleting then adding the same commands
@@ -25,12 +26,14 @@
 
 /********************************* CONSTS *********************************/
 
-const fs = require('fs');                   //  node.js native file system
-const Discord = require('discord.js');      // discord api reference
-const dotenv = require('dotenv');           // for supporting a .env with secrets
-const client = new Discord.Client();        // for hosting a bot client in discord
-client.commands = new Discord.Collection(); // collection of user/admin commands to be stored
-client.cooldowns = new Discord.Collection();// collection of cooldowns for each command
+const fs = require('fs');                   							//  node.js native file system
+const { Client, GatewayIntentBits, Collection } = require('discord.js');// client, intent, and collection references
+const dotenv = require('dotenv');           							// for supporting a .env with secrets
+// use of intents (respectively in order): create roles based on rank; add emojis for reacting ranks; for use of webhooks in match.js; creating a new message; reacting to message prompting for ranks; reading messages from users
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildWebhooks, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.MessageContent]});
+																		// ^for hosting a bot client in discord
+client.commands = new Collection(); 							// collection of user/admin commands to be stored
+client.cooldowns = new Collection();							// collection of cooldowns for each command
 
 dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-variables-from-a-.env-file-in-nodejs
 
@@ -41,7 +44,7 @@ dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-v
 client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
 
 // for fulltime use
-client.prefix = '/';         // the prefix for rall commands
+client.prefix = '/';         // the prefix for all commands
 client.default_cooldown = 5; // default cooldown time if none is given
 
 
@@ -55,12 +58,11 @@ const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'
 for (const file of eventFiles) {
 	if (file === 'message.js') continue; // skip message callback for now
 	const event = require(`./events/${file}`);
-	if (event.once) {
+	if (event.once) { // if has "once" flag to only be called once
 		client.once(event.name, (...args) => event.execute(...args, client));
 	} else if (event.ws) { // DO NOT SPREAD INTERACTION_CREATE
 		client.ws.on(event.name, args => event.execute(args, client));
-	}
-	else {
+	} else { // if not INTERACTION_CREATE or single time setup (callable command)
 		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }

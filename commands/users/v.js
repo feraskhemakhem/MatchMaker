@@ -17,6 +17,6 @@ module.exports = {
     // actual command code
 	async execute(interaction, args, client) {
         // get version from package file
-        reply(client, interaction, `MatchMaker ${package.version}`);
+        reply(client, interaction, `MatchMaker v${package.version}`);
     },
 };

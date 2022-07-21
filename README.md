@@ -1,6 +1,10 @@
-# MatchMaker v2.6.2
+# MatchMaker v2.6.3
 
 A discord bot that creates rank-based teams from a pool of players.
+
+### New In This Patch
+
+v2.6.3 sees a fresh review after slash commands are fully implemented. `discord.js` v12 is outdated, so the codebase is updated to support v14 in this patch. Some previously broken slash commands are fixed, and `README.md` gets a bit of love. In addition, `CHANGELOG.md` is added to the codebase to keep up with changes made in each version.
 
 ## Games Supported
 
@@ -26,7 +30,7 @@ This inspiration evolved as Valorant become a popular game in my active Discord 
 
 If you want to add this bot a server you're in, ask an admin [or yourself if you are one ;)] to use this link for inviting MatchMaker. [Click this to add the bot to your server :)](https://discord.com/oauth2/authorize?client_id=721167637006123088&permissions=3709861105&scope=bot%20applications.commands)
 
-### Once MatchMaker has Joined
+### Once MatchMaker Has Joined
 
 Hopefully I'm still talking to the admin. `!commands` will show you all of the avaiable commands for MatchMaker (using this as an admin will show more commands than a regular user), but the most important thing for setting up a collection system for player elo/ranks. This command is the `!setup` reaction, and should ***ONLY BE USED ONCE EVER. The only exception is if you delete the old message, and hopefully you've done that for a good reason***. 
 
@@ -55,7 +59,7 @@ In order to download the code and make it your own, do the following:
 2. Prepare your Node.js environment (npm init, npm install, all that jazz).
 3. Go to [discord.com/deveopers](discord.com/developers) and follow [these instructions](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot). 
 4. Once you generate your token, add it to your local build of the app. The `dotenv` library is supported in the code, so just create a `.env` file with a secret consisting of your token. The secret name is `BOT_TOKEN`, but you can change it if you want at the very bottom of the `bot.js` file. You can opt to use a `config.json` file (like they do (here)[https://discordjs.guide/creating-your-bot/configuration-files.html]), but I prefer the `.env` because Heroku's secret is stored with the same variable `process.env.BOT_TOKEN` as `dotenv`. NOTE: Your token is a private key that you should share with nobody! Make sure any files that contain your token are not pushed to GitHub (`.env` is included in the `.gitignore` by default). In addition, your token will not be accessible through the developer portal once you generate it, so make sure to record it; otherwise, you may have to reset your token.
-5. To run your code locally, run `npm bot.js` in the base directory of this project.
+5. To run your code locally, run `node bot.js` in the base directory of this project.
 6. If you wish to host it on a server, it does not take too many resources at all. I'm using a free Heroku instance currently. Just make sure to set a config variable for your token secret, as well as a buildpack for Node.
 
 With that, you should be up and running your own server! As the project expands, more will be added.

@@ -1,4 +1,5 @@
 // module for interaction event of client
+// this function gets called when interacting with user, which should be with every command
 
 const { reply } = require('../helper_functions/event_helper.js');
 

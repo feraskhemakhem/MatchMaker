@@ -3,7 +3,7 @@
 /****************************** CONSTS ******************************/
 
 const Discord = require('discord.js'); // discord api reference
-const mm_mulan = new Discord.MessageAttachment('./assets/matchmakermulan.jpg'); // for hosting mulan image
+const mm_mulan = new Discord.AttachmentBuilder('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
 // just some puns
 const puns = ['It was a match made in heaven', 'we make matches, not lighters', 'the match of the century'];

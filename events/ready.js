@@ -16,9 +16,9 @@ module.exports = {
         // set user status
         client.user.setActivity(`${prefix}help for help`, {type: 'WATCHING'});
 
-        // wait for a reference to author's user
-        const app = await client.fetchApplication();
-        client.my_maker = app.owner;
+        // wait until client is "ready" before fetching application owner
+        while (!client.isReady());
+        client.my_maker = client.application.owner;
 
         // const slash_command = await client.guilds.cache.get('625862970135805983')?.commands.create(data);
         // console.log(`slash is ${JSON.stringify(slash_command)}`);
@@ -27,7 +27,7 @@ module.exports = {
         // read all the sub-folders of commands
         const commandFolders = fs.readdirSync('./commands');
 
-        // add just /v for now
+        // (temporary) add just /v for now
         const working_functions = ['v', 'help', 'reroll', 'match'];
         for (const w of working_functions) {
                 const command = require(`../commands/users/${w}.js`);
