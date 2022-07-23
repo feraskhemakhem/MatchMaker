@@ -11,23 +11,9 @@ module.exports = {
                 data = await createAPIMessage(interaction, response);
         }
 
-        // POST V13 CODE
-        // await interaction.reply(response);
-        // return await interaction.fetchReply();
-
-        //  reply? TODO: since discord.js doesnt natively support it yet, doing it ugly
-        await client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                        type: 4, // CHANNEL_MESSAGE_WITH_SOURCE
-                        data: data,
-                }
-        });
-
-        // GET THE ORIGINAL RESPONSE MESSAGE
-        const reply = await client.api.webhooks(client.user.id, interaction.token).messages('@original').get();
-
-        console.log(`reply sent for response: ${response} and ${typeof{reply}}, ${JSON.stringify(reply)}`);
-        return reply;
+        // POST V13 CODE (tweaked for v13)
+        await interaction.reply(response);
+        return await interaction.fetchReply();
     },
     followUp: async function(client, interaction, response) {
         new Discord.WebhookClient(client.user.id, interaction.token).send(response);

@@ -21,16 +21,11 @@ module.exports = {
         // wait until client is "ready" before fetching application owner
         client.application.fetch()
                 .then(value => { client.my_maker = value.owner; });
-
-        // const slash_command = await client.guilds.cache.get('625862970135805983')?.commands.create(data);
-        // console.log(`slash is ${JSON.stringify(slash_command)}`);
     
         // processing commands
-        // read all the sub-folders of commands
-        const commandFolders = fs.readdirSync('./commands');
 
         // (temporary) add just /v for now
-        const working_functions = ['v', 'help', 'reroll', 'match'];
+        const working_functions = ['v'];
         for (const w of working_functions) {
                 const command = require(`../commands/users/${w}.js`);
                 client.commands.set(command.name, command);
@@ -42,7 +37,9 @@ module.exports = {
         client.commands.set(command.name, command);
         cooldowns.set(command.name, new Discord.Collection());
 
-    
+        // // read all the sub-folders of commands
+        // const commandFolders = fs.readdirSync('./commands');
+
         // // for each subfolder, get all the files ending in js
         // for (const folder of commandFolders) {
         //     if (folder.endsWith('js')) continue; // if a file and not a folder, skip
@@ -57,9 +54,6 @@ module.exports = {
         //         cooldowns.set(command.name, new Discord.Collection());
         //     }
         // }
-
-        // register slash commands
-
     
         console.log(`I'm ready!`);
 	},

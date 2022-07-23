@@ -1,10 +1,10 @@
-# MatchMaker v2.7.0
+# MatchMaker v2.6.3
 
 A discord bot that creates rank-based teams from a pool of players.
 
 ### New In This Patch
 
-v2.7.0 sees a fresh review after slash commands are fully implemented. `discord.js` v12 is outdated and does not natively support slash commands, so the codebase is updated to support v14 in this patch. Some previously broken slash commands are fixed, and `README.md` gets a bit of love. In addition, `CHANGELOG.md` is added to the codebase to keep up with changes made in each version, and a new directory `local_helpers` is added to add resources for local testing of the project.
+v2.6.3 sees a fresh review after slash commands are fully implemented. `discord.js` v12 is outdated and does not natively support slash commands, so the codebase is updated to support v14 in this patch. This means slash commands no longer require API calls, affecting the code in a large way. v.js is the first function to transition in v2.6.3, and `README.md` gets a bit of love. In addition, `CHANGELOG.md` is added to the codebase to keep up with changes made in each version.
 
 Full details in `CHANGELOG.md`.
 

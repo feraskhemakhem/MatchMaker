@@ -35,7 +35,9 @@ module.exports = {
                 functional_desc = command.description.substring(0, command.description.indexOf('.'));
             }
             // add command to list of commands
-            client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
+            const curr_guild = await client.guilds.fetch(process.env.GUILD_ID);
+
+            curr_guild.commands.post({data: {
                 name: command.name,
                 description: functional_desc,
                 options: command.options,
@@ -51,9 +53,13 @@ module.exports = {
 
                 console.log(`deleting old commands...`);
 
-                const old_ids = await client.api.applications(client.user.id).guilds('625862970135805983').commands.get();
+                // obtain old ids
+                const curr_guild = await client.guilds.fetch(process.env.GUILD_ID);
+                const old_ids = await curr_guild.commands.get();              
+                
+                // delete each id from commands list
                 old_ids.forEach(old_id => {
-                    client.api.applications(client.user.id).guilds('625862970135805983').commands(old_id.id).delete();
+                    curr_guild.commands(old_id.id).delete();
                 });
 
                 console.log(`adding all commands...`);
@@ -70,7 +76,7 @@ module.exports = {
                     console.log(`adding command ${commandName}`);
 
                     // add slash command
-                    client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
+                    curr_guild.commands.post({data: {
                         name: command.name,
                         description: functional_desc,
                         options: command.options,
@@ -82,9 +88,13 @@ module.exports = {
             else if (args[0].toLowerCase() === 'clear') {
                 console.log(`deleting old commands...`);
 
-                const old_ids = await client.api.applications(client.user.id).guilds('625862970135805983').commands.get();
+                // obtain old ids
+                const curr_guild = await client.guilds.fetch(process.env.GUILD_ID);
+                const old_ids = await curr_guild.commands.get();
+
+                // delete each command id
                 old_ids.forEach(old_id => {
-                    client.api.applications(client.user.id).guilds('625862970135805983').commands(old_id.id).delete();
+                    curr_guild.commands(old_id.id).delete();
                 });
                 console.log(`done`);
             }
@@ -107,11 +117,15 @@ module.exports = {
                     functional_desc = command.description.substring(0, command.description.indexOf('.'));
                 }
                 // add command to list of commands
-                client.api.applications(client.user.id).guilds('625862970135805983').commands.post({data: {
+                // this also changed with v14 of discord.js
+                const curr_guild = await client.guilds.fetch(process.env.GUILD_ID);
+                curr_guild.commands.create({
                     name: command.name,
                     description: functional_desc,
                     options: command.options,
-                }});
+                })
+                .then(console.log)
+                .catch(console.error);
 
                 last_command = args[0];
 

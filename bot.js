@@ -9,6 +9,9 @@
 // - (DONE) Add stdev command to developers
 // - (DONE) If deploy/reload has no args, use last used command name
 // - (DONE) Make database readings within the function instead of outside function
+// - Convert ALL functions with args into using the options property of the interaction
+// - Revisit "followUp" function in event_helper.js
+// - Revisit embed functionality in reply function
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
@@ -20,6 +23,7 @@
 // - Add oppourtunity for automatic registration of players from a voice channel (e.g. '-vc')
 
 // v4.0:
+// - Revisit the need for a commands collection, as commands are stored on discord when deploying them
 // - Investigate whether patching commands is better than deleting then adding the same commands
 // - WHENEVER IT COMES OUT, UPDATE INTERACTIONS TO WORK WITH DISCORDJS INSTEAD OF USING REST API
 
@@ -41,7 +45,10 @@ dotenv.config(); //https://coderrocketfuel.com/article/how-to-load-environment-v
 /********************************* GLOBAL VARIABLES *********************************/
 
 // for testing
-client.debug = true;         // BOOLEAN FOR DEBUGGING :DD
+client.debug = true;         // BOOLEAN FOR DEBUGGING :DD (turn on in shipped builds)
+if (!client.debug) {		 // only prints console logs when debugging
+	console.log = function() {};
+}
 
 // for fulltime use
 client.prefix = '/';         // the prefix for all commands
@@ -61,11 +68,7 @@ for (const file of eventFiles) {
 	if (event.once) { // if has "once" flag to only be called once
 		client.once(event.name, (...args) => event.execute(...args, client));
 	}
-	else if (event.ws) { // DO NOT SPREAD INTERACTION_CREATE (uses web socket here, but current support does not)
-		client.ws.on(event.name, args => event.execute(args, client));
-	} 
 	else { // if callable event (interaction_create [slash commands], message)
-		console.log(file);
 		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }
