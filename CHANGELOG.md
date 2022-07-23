@@ -29,5 +29,3 @@ This update exists as the first revisit of the codebase in over a year. With a f
 - reply function got a huge facelift to become essentially a 2-line function with the introduction of interactions in v14 [event_helper.js]
  
 ### Fixed
-
-- help command failed 
