@@ -50,26 +50,29 @@ client.default_cooldown = 5; // default cooldown time if none is given
 
 /********************************* FUNCTIONS *********************************/
 
-// https://discordjs.guide/event-handling/#individual-event-files
-// get all event files
+// https://discordjs.guide/creating-your-bot/event-handling.html#individual-event-files
+// get all event files (files ending with '.js' in events folder)
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
 // instantiate events from js files in events folder
 for (const file of eventFiles) {
-	if (file === 'message.js') continue; // skip message callback for now
+	// if (file === 'messageCreate.js') continue; // skip message callback for now (DEPRICATED)
 	const event = require(`./events/${file}`);
 	if (event.once) { // if has "once" flag to only be called once
 		client.once(event.name, (...args) => event.execute(...args, client));
-	} else if (event.ws) { // DO NOT SPREAD INTERACTION_CREATE
+	}
+	else if (event.ws) { // DO NOT SPREAD INTERACTION_CREATE (uses web socket here, but current support does not)
 		client.ws.on(event.name, args => event.execute(args, client));
-	} else { // if not INTERACTION_CREATE or single time setup (callable command)
+	} 
+	else { // if callable event (interaction_create [slash commands], message)
+		console.log(file);
 		client.on(event.name, (...args) => event.execute(...args, client));
 	}
 }
 
-// client.on('INTERACTION_CREATE', async interaction => {
+// client.on('interactionCreate', async interaction => {
 // 	console.log(`interaction`);
 // });
 
 // THIS  MUST  BE  THIS  WAY
-client.login(process.env.BOT_TOKEN); //BOT_TOKEN is the Client Secret
+client.login(process.env.BOT_TOKEN); // BOT_TOKEN is the Client Secret

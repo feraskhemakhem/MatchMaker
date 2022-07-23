@@ -14,11 +14,13 @@ module.exports = {
         const require_path = '../commands';
 
         // set user status
-        client.user.setActivity(`${prefix}help for help`, {type: 'WATCHING'});
+        client.user.setActivity(`${prefix}help for help`, {type: Discord.ActivityType.Watching});
+
+        console.log(`Ready! Logged in as ${client.user.tag}`);
 
         // wait until client is "ready" before fetching application owner
-        while (!client.isReady());
-        client.my_maker = client.application.owner;
+        client.application.fetch()
+                .then(value => { client.my_maker = value.owner; });
 
         // const slash_command = await client.guilds.cache.get('625862970135805983')?.commands.create(data);
         // console.log(`slash is ${JSON.stringify(slash_command)}`);
@@ -34,6 +36,11 @@ module.exports = {
                 client.commands.set(command.name, command);
                 cooldowns.set(command.name, new Discord.Collection());
         }
+
+        // HARDCODED TEMP: also add deploy function
+        const command = require(`../commands/developers/deploy.js`);
+        client.commands.set(command.name, command);
+        cooldowns.set(command.name, new Discord.Collection());
 
     
         // // for each subfolder, get all the files ending in js

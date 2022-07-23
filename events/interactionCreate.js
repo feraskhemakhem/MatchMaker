@@ -1,5 +1,7 @@
 // module for interaction event of client
 // this function gets called when interacting with user, which should be with every command
+// TODO: read this when getting to interations https://discordjs.guide/creating-your-bot/creating-commands.html#replying-to-commands
+// I like the isCommand
 
 const { reply } = require('../helper_functions/event_helper.js');
 

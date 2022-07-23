@@ -60,6 +60,7 @@ module.exports = {
 
                 // iterate through existing commands
                 for (const [commandName, command] of client.commands) {
+                    // only deploy public commands not for admins
                     if (command.admin || !command.public) continue;
                     // only access up to first 100 characters of description if applicable
                     let functional_desc = command.description;

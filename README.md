@@ -1,10 +1,12 @@
-# MatchMaker v2.6.3
+# MatchMaker v2.7.0
 
 A discord bot that creates rank-based teams from a pool of players.
 
 ### New In This Patch
 
-v2.6.3 sees a fresh review after slash commands are fully implemented. `discord.js` v12 is outdated, so the codebase is updated to support v14 in this patch. Some previously broken slash commands are fixed, and `README.md` gets a bit of love. In addition, `CHANGELOG.md` is added to the codebase to keep up with changes made in each version.
+v2.7.0 sees a fresh review after slash commands are fully implemented. `discord.js` v12 is outdated and does not natively support slash commands, so the codebase is updated to support v14 in this patch. Some previously broken slash commands are fixed, and `README.md` gets a bit of love. In addition, `CHANGELOG.md` is added to the codebase to keep up with changes made in each version, and a new directory `local_helpers` is added to add resources for local testing of the project.
+
+Full details in `CHANGELOG.md`.
 
 ## Games Supported
 
@@ -59,7 +61,7 @@ In order to download the code and make it your own, do the following:
 2. Prepare your Node.js environment (npm init, npm install, all that jazz).
 3. Go to [discord.com/deveopers](discord.com/developers) and follow [these instructions](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot). 
 4. Once you generate your token, add it to your local build of the app. The `dotenv` library is supported in the code, so just create a `.env` file with a secret consisting of your token. The secret name is `BOT_TOKEN`, but you can change it if you want at the very bottom of the `bot.js` file. You can opt to use a `config.json` file (like they do (here)[https://discordjs.guide/creating-your-bot/configuration-files.html]), but I prefer the `.env` because Heroku's secret is stored with the same variable `process.env.BOT_TOKEN` as `dotenv`. NOTE: Your token is a private key that you should share with nobody! Make sure any files that contain your token are not pushed to GitHub (`.env` is included in the `.gitignore` by default). In addition, your token will not be accessible through the developer portal once you generate it, so make sure to record it; otherwise, you may have to reset your token.
-5. To run your code locally, run `node bot.js` in the base directory of this project.
+5. To run your code locally, run `node bot.js` in the base directory of this project. This project also includes `nodemon` as a dev dependency, so `nodemon bot.js` should work natively. `nodemon` is recommended for development as it ensures proper reloading of the application between saves.
 6. If you wish to host it on a server, it does not take too many resources at all. I'm using a free Heroku instance currently. Just make sure to set a config variable for your token secret, as well as a buildpack for Node.
 
 With that, you should be up and running your own server! As the project expands, more will be added.
