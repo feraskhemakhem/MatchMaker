@@ -54,7 +54,7 @@ _Admin Commands:_
 
 A reminder that for further guidance, `!commands` will provide details on each command.
 
-## How to Setup Your Own MatchMaker
+## How to Setup Your Own MatchMaker Codebase
 In order to download the code and make it your own, do the following:
 
 1. Download this repo from GitHub (look at releases for stable versions of this repo).
