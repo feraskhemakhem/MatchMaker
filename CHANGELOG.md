@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
  
-## [2.6.3] - 2022-7-dd
+## [2.6.3] - 2022-7-22
  
 This update exists as the first revisit of the codebase in over a year. With a fresh set of eyes, things are slowly being cleaned up and functionality of slash commands is taken with a fresh approach. discord.js v14 is introduced in this updated with v10 of the discord API, and most of the work in this iteration is to get the code up to speed to ensure it works with discord.js v14.
 
