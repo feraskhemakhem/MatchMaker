@@ -29,8 +29,8 @@ module.exports = {
         const ids = Array.from(data.cached_players);
         let player_vals = {};
         ids.forEach(id => {
-            if (data.player_elos[id]) { // if info exists, use that
-                player_vals[id] = data.player_elos[id];
+            if (data.player_scores[id]) { // if info exists, use that
+                player_vals[id] = data.player_scores[id];
             }
             else { // if elo isnt stored, use any negative number
                 player_vals[id] = -69;

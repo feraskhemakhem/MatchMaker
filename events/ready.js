@@ -25,7 +25,7 @@ module.exports = {
         // processing commands
 
         // (temporary) add just /v for now
-        const working_functions = ['v'];
+        const working_functions = ['v', 'elo'];
         for (const w of working_functions) {
                 const command = require(`../commands/users/${w}.js`);
                 client.commands.set(command.name, command);

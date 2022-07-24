@@ -1,7 +1,8 @@
 // js file for the checking elo command
 
 // self-defined helper functions
-const { readData, updateEloOnce } = require('../../helper_functions/db_helper.js');
+const { ApplicationCommandOptionType } = require('discord.js');
+const { getScore, updateScoreOnce } = require('../../helper_functions/db_helper.js');
 const helper = require('../../helper_functions/helper.js');
 
 module.exports = {
@@ -9,13 +10,14 @@ module.exports = {
 	name: 'elo',
     admin: false,
     public: true,
-    cooldown: 10,
+    cooldown: 6,
     // description of command
 	description: 'Reacts with user\'s elo stored in database',
+    // the options for the command (subcommands)
     options: [{
         name: 'option',
         description: 'either \'get\' or \'set\' for the elo of the user',
-        type: 3, // string
+        type: ApplicationCommandOptionType.String, // string
         choices: [
             {
                 name: 'set',
@@ -31,62 +33,74 @@ module.exports = {
     {
         name: 'user',
         description: 'the user at hand (default is self)',
-        type: 6, // user
+        type: ApplicationCommandOptionType.User, // user
         required: false,
     },
     {
         name: 'elo',
-        description: 'elo to set to if set is true',
-        type: 3, // string
+        description: 'elo to set to (ONLY FOR SET OPTION)',
+        type: ApplicationCommandOptionType.String, // string
         require: false,
         choices: helper.getEloChoices(),
     }],
 
     // actual command code
-	async execute(message, args) {
+	async execute(interaction, client) {
 
-        // set user value based on arg 2 (user)
-        let user_id = message.author.id;
-        if (args.length === 2)
-            user_id = message.mentions.users.first().id;
-
-        console.log(`/command is ${args[0]} by ${user_id}`);
-
-        // if get, return value of user
-        if (args[0] === 'get') {
-            const data = readData();
-
-            if (!data.player_elos[user_id]) { // if rank doesnt exists, print it
-                console.log(`elo is ${data.player_elos[user_id]}`);
-                message.react('🚫');
-                return;
-            }
-            // find the emoji we want given guild and elo
-            helper.findValorantEmoji(helper.scoreToElo(data.player_elos[user_id]), message.guild)
-            .then(emoji => message.react(emoji));
+        // set user value if 'user' option provided (otherwise default to person calling elo)
+        let user;
+        if ((user = interaction.options.getUser('user')) === null) {
+            user = interaction.user;
         }
-        // if set, change value of user (unless user is someone else and not admin)
-        else if (args[0] === 'set') {
-            // if trying to set id of someone else and not admin, deny
-            if (user_id !== message.author.id
-                && message.member.hasPermission('ADMINISTRATOR')) return;
+        const user_id = user.id;
 
-            if (args.length < 3) {
-                message.reply('Elo is required for set function');
-                return;
+        const user_option = interaction.options.getString('option');
+        console.log(`/elo command is ${user_option} by ${interaction.user.username} for ${user.username}`);
+
+        // if get, return elo of the user from database
+        if (user_option === 'get') {
+
+            // if rank doesnt exists, throw error and react accordingly
+            let score;
+            if ((score = getScore(user_id)) === undefined) {
+                console.log(`invalid user elo for user ${user.username}`);
+                interaction.reply(`Error: ${user} has no recorded elo. Set ${user}'s elo before before trying to get it`);
+                return undefined;
             }
-            const elo = args[2].charAt(0).toUpperCase() + args[2].slice(1); // make first letter uppercase of first arg
+
+            // obtain the elo of the player and reply that elo (or error)
+            let elo;
+            if ((elo = helper.scoreToElo(score)) === undefined) {
+                // this error should never happen - previous error checking should resolve this
+                interaction.reply(`Error: this is an unexpected error 🤔 please contact ${client.my_maker} with ERRONO 1, and set ${user}'s elo again`);
+                return undefined;
+            }
+            interaction.reply(elo);
+        }
+        // if set, change value of user (unless attempting to change someone else's rank and not admin)
+        else if (user_option === 'set') {
+
+            // if trying to set id of someone else and not admin, deny
+            if (user_id !== interaction.user.id
+                && !interaction.memberPermissions.has('ADMINISTRATOR')) return;
+
+            // ensure that elo is provided
+            let elo;
+            if ((elo = interaction.options.getString('elo')) === null) {
+                interaction.reply('Error: Elo is required for set function');
+                return undefined;
+            }
 
             // calculate the score based on the elo provided
             let score;
             if ((score = helper.eloToScore(elo)) === -1) { // if -1, then error, so return
-                message.reply('Error: problem processing this rank');
+                interaction.reply('Error: invalid elo obtained, so cannot process. Please try again');
                 return undefined;
             }
 
             // add data to temp database
-            updateEloOnce(user_id, score);
-            
+            updateScoreOnce(user_id, score);
+            interaction.reply(`updating ${user}'s rank to ${elo}`);
         }
     },
 };

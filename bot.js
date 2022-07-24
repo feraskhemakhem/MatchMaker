@@ -5,19 +5,20 @@
 // For v3.0:
 // - (DONE) Make code more efficient / argument based
 // - (DONE) Make commands slash-based instead of exlcimation-based
-// - Look into SQL Lite and see if it's worth it for this scope
+// - (DONE) Look into SQL Lite and see if it's worth it for this scope
 // - (DONE) Add stdev command to developers
 // - (DONE) If deploy/reload has no args, use last used command name
 // - (DONE) Make database readings within the function instead of outside function
 // - Convert ALL functions with args into using the options property of the interaction
 // - Revisit "followUp" function in event_helper.js
 // - Revisit embed functionality in reply function
+// - Investigate database options that are non-local
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
 // - (DONE) Use subcommand groups to organize elo change (setelo, getelo, etc) (https://discord.com/developers/docs/interactions/slash-commands#subcommands-and-subcommand-groups)
 // - Update readme to include information of what files are what
-// - Add interaction optimization
+// - (DONE) Add interaction optimization
 // - Add permissions for setup function
 // - Add preprocessor code for readme to make version and command details automatic
 // - Add oppourtunity for automatic registration of players from a voice channel (e.g. '-vc')
@@ -25,7 +26,8 @@
 // v4.0:
 // - Revisit the need for a commands collection, as commands are stored on discord when deploying them
 // - Investigate whether patching commands is better than deleting then adding the same commands
-// - WHENEVER IT COMES OUT, UPDATE INTERACTIONS TO WORK WITH DISCORDJS INSTEAD OF USING REST API
+// - (DONE for v3.0) WHENEVER IT COMES OUT, UPDATE INTERACTIONS TO WORK WITH DISCORDJS INSTEAD OF USING REST API
+// - Change readData() to only pull single entry instead of all entries (optimization)
 
 
 /********************************* CONSTS *********************************/

@@ -3,12 +3,12 @@
 module.exports = {
     reply : async function(client, interaction, response) {
         let data = {
-                content: response,
+            content: response,
         };
 
         // check for embeds
         if (typeof response === 'object') {
-                data = await createAPIMessage(interaction, response);
+            data = await createAPIMessage(interaction, response);
         }
 
         // POST V13 CODE (tweaked for v13)

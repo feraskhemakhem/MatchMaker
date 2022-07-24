@@ -2,7 +2,7 @@
 
 // self-defined helper functions
 const helper = require('../../helper_functions/helper.js');
-const { updateEloOnce } = require('../../helper_functions/db_helper.js');
+const { updateScoreOnce } = require('../../helper_functions/db_helper.js');
 
 module.exports = {
     // command name
@@ -54,7 +54,7 @@ module.exports = {
             // process elo reaction (this is the hardest line to figure out in all of my code)
 
             // add elo to database
-            updateEloOnce(user.id, helper.processEloReaction(reaction, user));
+            updateScoreOnce(user.id, helper.processEloReaction(reaction, user));
         });
         console.log(`setup message resolved`);
 

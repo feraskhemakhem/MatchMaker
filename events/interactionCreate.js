@@ -9,10 +9,16 @@ module.exports = {
         ws: true,
 	async execute(interaction, client) {
                 
+                /************************************ check interaction requirements ************************************/
                 if (!interaction.isChatInputCommand()) return; // if not a slash command message, ignore it
                 if (!interaction.isRepliable()) return; // if cannot reply, then don't even try!
+                if (interaction.member.user.bot) return; // if message comes from bot, ignore it
 
                 const commandName = interaction.commandName.toLowerCase();
+                if (!client.commands.has(commandName)) return; // iif not a registered command in "commands", skip
+
+                const command = client.commands.get(commandName);
+                if (!command.public && interaction.member.id !== client.my_maker.id) return; // if not public and I (owner) don't ask for it, ignore
 
                 // print interaction information
                 console.log(`interaction: ${interaction}`);
@@ -21,16 +27,8 @@ module.exports = {
                 // get cooldowns to get ensure this command is not on cooldown
                 const { cooldowns, default_cooldown } = client;
 
-                // if message comes from bot, ignore it
-                if (interaction.member.user.bot) return;
-
-                /************************************ check user permissions and cooldown ************************************/
+                /************************************ check cooldown ************************************/
                 // https://discordjs.guide/command-handling/#dynamically-executing-commands
-                if (!client.commands.has(commandName)) return; // iif not a command, skip
-                const command = client.commands.get(commandName);
-
-                // if not public and I (owner) don't ask for it, ignore
-                if (!command.public && interaction.member.id !== client.my_maker.id) return;
 
                 // if admin command and you aren't an admin, get out of here!
                 if (command.admin && !interaction.memberPermissions.has('ADMINISTRATOR')) return;

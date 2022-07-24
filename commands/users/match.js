@@ -88,8 +88,8 @@ module.exports = {
                     // find these ids in the list and make a dictionary of their elos
                     let elos = {};
                     ids.forEach(element => {
-                        if (data.player_elos[element]) { // if found, just read it lol
-                            elos[element] = data.player_elos[element];
+                        if (data.player_scores[element]) { // if found, just read it lol
+                            elos[element] = data.player_scores[element];
                         }
                         else { // if rank is not found, use random negative number
                             elos[element] = -69;

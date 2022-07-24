@@ -1,4 +1,5 @@
 // https://stackoverflow.com/questions/50426635/exporting-importing-in-node-js-discord-js
+// helper file for emoji, setup, and elo functions
 
 /****************************** CONSTS ******************************/
 
@@ -9,6 +10,9 @@ const mm_mulan = new Discord.AttachmentBuilder('./assets/matchmakermulan.jpg'); 
 const puns = ['It was a match made in heaven', 'we make matches, not lighters', 'the match of the century'];
 const ranks = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Immortal', 'Radiant'];
 
+// important formatting decisions
+const emoji_prefix = 'MMValorant';
+
 
 /****************************** FUNCTIONS ******************************/
 
@@ -18,19 +22,22 @@ module.exports = {
     // prints: N/A
     // returns: guild emoji for associated rank in the server
     findValorantEmoji: async function(elo, guild) {
-        let valorant_emojis = guild.emojis.cache.filter(emoji => emoji.name.startsWith(`Valorant${elo}`));
+        // CHECK IF GUILD IS AVAILABLE FIRST
+        if (!guild.available) return null;
+
+        // find emoji in guild cache
+        let valorant_emojis = guild.emojis.cache.filter(emoji => emoji.name.startsWith(`${emoji_prefix}${elo}`));
         valorant_emojis = Array.from(valorant_emojis.values());
-        // console.log(valorant_emojis);
+
+        // collect emoji names
         let emoji_names = [];
         valorant_emojis.forEach(element => emoji_names.push(element.name));
-        // console.log(valorant_emojis);
         
-        if (emoji_names.indexOf(`Valorant${elo}`) === -1) { // if not found, add it then react
-            new_emoji = await guild.emojis.create(`./assets/Valorant${elo}.webp`, `Valorant${elo}`, {reason:'For use with the MatchMaker bot'});
+        // if emoji not found, then add it before returning
+        if (emoji_names.indexOf(`${emoji_prefix}${elo}`) === -1) { 
+            new_emoji = await guild.emojis.create({attachment:`./assets/Valorant${elo}.webp`, name:`${emoji_prefix}${elo}`, reason:'For use with the MatchMaker bot'});
         }
-        else { // if emoji aready exists, react
-            new_emoji = valorant_emojis[emoji_names.indexOf(`Valorant${elo}`)];
-        }
+        // return emoji
         return new_emoji;
     },
     // function for processing elo reaction in !setup message
@@ -67,13 +74,17 @@ module.exports = {
     // returns: bool of whether reaction is a valorant rank emoji
     isValorantEmoji: function(reaction_name) {
         // check if any name starts with "Valorant(rank)"
-        return ranks.some(rank => reaction_name.startsWith(`Valorant${rank}`)); // apparently for each doesnt work but this is cleaner
+        return ranks.some(rank => reaction_name.startsWith(`${emoji_prefix}${rank}`)); // apparently for each doesnt work but this is cleaner
     },
     // function for parsing !setup command and sending setup message
     // parameters: original !setup message, default text if no text is given
     // prints: setup message in requested channel
     // returns: setup message, or undefined if failed
     setup: async function(message, defaultText) {
+
+        // if guild unavailable, no point in trying
+        if (!message.guild.available) return undefined;
+
         // some string parsing for reading the message content
         let first_space;
         if ((first_space = message.content.indexOf(' ')) === -1) { // if first space not found
@@ -150,14 +161,8 @@ module.exports = {
             return -1;
         }
 
-        // plat is same as platinum
-        if (elo === 'Plat') {
-            elo = 'Platinum';
-        }
-
-        let score = ranks.indexOf(elo);
-
-        return score;
+        // get score from array and return
+        return ranks.indexOf(elo);
     },
     // function for printing teams using embed message
     // parameters: channel reference for sending

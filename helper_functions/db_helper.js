@@ -25,15 +25,22 @@ module.exports = {
     // function for writing given data to a file
     writeData: writeData,
     // updates data with the elo of user
-    addElo: function (data, user_id, elo) {
-        data.player_elos[user_id] = elo;
+    addScore: function (data, user_id, elo) {
+        data.player_scores[user_id] = elo;
         return data;
     },
+    // obtains elo for given user_id
+    getScore: function (user_id) {
+        // read data
+        const data = readData();
+        // return score of user (else return null)
+        return data.player_scores[user_id];
+    },
     // function for adding a single elo
-    updateEloOnce: function (user_id, elo) {
+    updateScoreOnce: function (user_id, elo) {
         // read and update data
         const data = readData();
-        data.player_elos[user_id] = elo;
+        data.player_scores[user_id] = elo;
         // write to file
         writeData(data);
     },
