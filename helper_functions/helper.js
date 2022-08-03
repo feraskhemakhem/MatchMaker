@@ -3,8 +3,8 @@
 
 /****************************** CONSTS ******************************/
 
-const Discord = require('discord.js'); // discord api reference
-const mm_mulan = new Discord.AttachmentBuilder('./assets/matchmakermulan.jpg'); // for hosting mulan image
+const { AttachmentBuilder, EmbedBuilder } = require('discord.js'); // discord api reference
+const mm_mulan = new AttachmentBuilder('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
 // just some puns
 const puns = ['It was a match made in heaven', 'we make matches, not lighters', 'the match of the century'];
@@ -175,8 +175,8 @@ module.exports = {
         const teams_embed = await this.templateEmbed();
 
         teams_embed
-        .setFooter(puns[Math.floor(Math.random() * puns.length)])  // add a little pun at the bottom
-        .setTitle('Teams')
+        .setFooter({ text: puns[Math.floor(Math.random() * puns.length)] })  // add a little pun at the bottom
+        .setTitle('Match Made!')
         .addFields(
             {name: 'Team 1', value: `${t1_string}`, inline: true},
             {name: '\u200B', value: '\u200B', inline: true},
@@ -185,7 +185,9 @@ module.exports = {
             {name: 'Advantage', value: team_ad_string},
         );
 
-        channel.send({files: [mm_mulan], embed: teams_embed});
+        const content_string = 'Here are the teams!';
+
+        channel.send({content: content_string, embeds: [teams_embed], files: [mm_mulan]});
     },
     // function for creating initial template for embed messages
     // parameters: discord reference
@@ -194,17 +196,23 @@ module.exports = {
     templateEmbed: async function() {
         // template embed for all MatchMaker messages
         // https://discordjs.guide/popular-topics/embeds.html#attaching-images-2
-        return commands_embed = await new Discord.MessageEmbed()
+        return commands_embed = await new EmbedBuilder()
             .setColor('#ffb7c5') // cherry blossom pink
-            .setAuthor('MatchMaker Bot', 'attachment://matchmakermulan.jpg', 'https://www.youtube.com/watch?v=fO263dPKqns') // link to 2nd best mulan song :)
+            .setAuthor({name: 'MatchMaker Bot', iconURL: 'attachment://matchmakermulan.jpg', url: 'https://www.youtube.com/watch?v=fO263dPKqns'}) // link to 2nd best mulan song :)
             .setTimestamp(); // to distinguish between embeds
 
     },
     // function for calculating the optimal teams
-    // parameters: objects containing pairs of player ids and ranks (strings : Integers), message reference for replying, client
+    // parameters: collection of users with (user_id : user object) pairs, objects containing pairs of player ids and ranks (strings : Integers), message reference for replying, standard deviation ratio to accept team
     // prints: teams
     // returns: bool for success
-    makeTeams: function(player_data, message, client, stdev_ratio) {
+    makeTeams: function(users, player_data, interaction, stdev_ratio) {
+
+        // error checking: if either users or player_data is less than 2 (need at least 2 to make a team)
+        if (users.size < 2 || Object.keys(player_data).length < 2) {
+            interaction.channel.send(`Error: Not enough players. Please try again with more players`);
+            return false;
+        }
 
         // step 0: create initial team lists
         // NOTE: ASSUMING ONLY 2 TEAMS
@@ -217,7 +225,7 @@ module.exports = {
         let num_players = Object.keys(player_data).length;
         let team_size = num_players / 2;
 
-        // i. calculate average player score ("aps")
+        // 1i. calculate average player score ("aps")
         let aps = 0;
         for (let key in player_data) {
             if (player_data[key] < 0) { // if unranked, disclude from average and give its value the average
@@ -243,10 +251,11 @@ module.exports = {
             }
         }
 
+        // print average player score for debugging
         console.log(`aps is ${aps}`);
         console.log(`players are ${JSON.stringify(player_data)}`);
 
-        // ii. calculate stdev
+        // 1ii. calculate stdev
         let stdev = 0;
         for (let key in player_data) {
             stdev = stdev + Math.pow(player_data[key] - aps, 2);
@@ -263,6 +272,8 @@ module.exports = {
             bad_teams = false;
             // if we fail to make teams at least 10 times, give up
             if (num_failures >= 10) {
+                // send a failure message if cannot make teams
+                interaction.channel.send('Unable to make teams with these players given their elos. Sorry :(');
                 return false;
             }
 
@@ -301,13 +312,13 @@ module.exports = {
                 }
                 for (let i = 2; i <= team_size; i++) {
                     
-                    // i. find target score to reach this iteration
+                    // 3i. find target score to reach this iteration
                     let target_score = aps * i;
 
-                    // ii. calculate ideal player score for this iteration
+                    // 3ii. calculate ideal player score for this iteration
                     let ideal_player_score = target_score - curr_team_score;
 
-                    // iii. find existing player with value closest to ideal player score
+                    // 3iii. find existing player with value closest to ideal player score
                     // TODO: IT MIGHT BE OPTIMAL IN THE FUTURE TO DETERMINE IF SAME DISTANCE ABOVE OR BELOW
                     // IS BETTER. MAYBE DEPENDENT ON WHETHER THE TEAM HAS BETTER PLAYERS OVERALL OR NOT?
                     let closest_id = "";
@@ -332,7 +343,7 @@ module.exports = {
                     delete remaining_players[closest_id];
                 }
 
-                // step 4: if team score is more than 1 stdev from expected total, restart algorithm
+                // step 4: if team score is more than (stdev_ratio * stdev) from average, restart algorithm
                 if (Math.abs(curr_team_score - (aps * team_size)) > stdev * stdev_ratio) {
                     bad_teams = true;
                     num_failures++;
@@ -346,41 +357,51 @@ module.exports = {
         console.log(`Team totals are ${curr_team_scores[0]} and ${curr_team_scores[1]}, respectively`);
         
         // step 5: determine advantage score based on team score and report
-        let team_diff = curr_team_scores[0] - curr_team_scores[1];
-        let team_advantage = 2; // default that team 2 has advantage
+        let team_diff = Math.abs(curr_team_scores[0] - curr_team_scores[1]);
+        let team_advantage = curr_team_scores[0] > curr_team_scores[1] ? 1 : 2; // advantage based on which team has higher score (if equal, 2, but it doesn't matter)
         let team_ad_string = '';
         if (team_diff === 0) { // if no diff, equal
             team_ad_string = 'Teams are perfectly balanced, as all things should be';
         }
-        else if (team_diff > 0) { // if difference is negative, first team has advantage
-            team_advantage = 1;
-            // print warnings based on how large the team diff is
-            if (team_diff <= 1.3 || team_diff >= -1.3) {
-                team_ad_string = `Team ${team_advantage} has a slight advantage`;
-            }
-            else {
-                team_ad_string = `Team ${team_advantage} has a large advantage`;
-            }
+        else if (team_diff <= 1.3) { // if team diff is small, mention it
+            team_ad_string = `Team ${team_advantage} has a slight advantage`;
+        }
+        else if (team_diff > 1.3) { // if team diff is big, mention it
+            team_ad_string = `Team ${team_advantage} has a large advantage`;
+        }
+        else { // team_diff should never be negative because we use abs
+            interaction.channel.send(`Error: Unexpected behaviour on our end. Please try again and contact ${interaction.client.my_maker} with ERRORNO 4`);
+            return false;
         }
 
-        // collect users into string for printing
+        // collect users into string for printing from their ids
         // https://stackoverflow.com/questions/63069415/discord-js-how-to-get-a-discord-username-from-a-user-id
+        // users -> collection of users
+        // users.get(user_id) -> user instance (.username to get username)
         let t1_string = '';
-        t1.forEach(element => {
-            let person = client.users.cache.get(element).username;
-            console.log(`person is: ${person}`);
-            t1_string = t1_string + '\n' + person;
+        t1.forEach(user_id => {
+            let person = users.get(user_id);
+            if (person === undefined) {
+                interaction.channel.send(`Error: One or more players have not been in the server for long enough. Please try again at a later time when the player is cached as a server member`);
+                return false;
+            }
+            console.log(`makeTeams: person in t1 is: ${person.username}`);
+            t1_string = t1_string + '\n' + person.username;
         });
 
         let t2_string = '';
-        t2.forEach(element => {
-            let person = client.users.cache.get(element).username;
-            console.log(`person is: ${person}`);
-            t2_string = t2_string + '\n' + person;
+        t2.forEach(user_id => {
+            let person = users.get(user_id);
+            if (person === undefined) {
+                interaction.channel.send(`Error: One or more players have not been in the server for long enough. Please try again at a later time when the player is cached as a server member`);
+                return false;
+            }
+            console.log(`makeTeams: person in t2 is: ${person.username}`);
+            t2_string = t2_string + '\n' + person.username;
         });
 
         // print results
-        this.printTeams(t1_string, t2_string, team_ad_string, message.channel);
+        this.printTeams(t1_string, t2_string, team_ad_string, interaction.channel);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
     },

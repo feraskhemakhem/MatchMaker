@@ -1,10 +1,10 @@
-# MatchMaker v2.6.4
+# MatchMaker v2.6.5
 
-A discord bot that creates rank-based teams from a pool of players.
+A discord bot that creates balanced teams for team-based video games.
 
 ### New In This Patch
 
-In our attempt to update our commands to v14, the elo command gets fixed in v2.6.4. The interaction object gets a lot more utilization over args, resulting in more precise and less faulty code. Database functionality is also revisited with more functionality added for the sake of the elo command.
+In our continued attempt to update our commands to discord.js v14, the match command gets fixed in v2.6.5. A more precise and foolproof implementation comes out of this patch with the use of the interaction class. In addition, the formatting of `CHANGELOG.md` is modified to better fit the scope of this function ("Fixed" --> "Removed", since "Fixed" and "Changes" have a large amount of overlap) and functions for created embeds are updated for v14.
 
 Full details in `CHANGELOG.md`.
 

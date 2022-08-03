@@ -1,10 +1,13 @@
 {
   "name": "matchmaker",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "Arranges teams for custom games based on elo",
   "main": "bot.js",
   "scripts": {
     "test": "node bot.js"
+  },
+  "nodemonConfig": {
+    "ignore": ["temp/*"]
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 // js file for the getting info on all other commands
 
 const { templateEmbed } = require('../../helper_functions/helper.js');  // self-defined helper functions
-const { reply } = require('../../helper_functions/event_helper.js');    // helper for all event-related things
+const { reply } = require('../../helper_functions/comm_helper.js');    // helper for all event-related things
 const { AttachmentBuilder } = require('discord.js');                    // attachment builder function reference
 const mm_mulan = new AttachmentBuilder('./assets/matchmakermulan.jpg'); // for hosting mulan image
 
@@ -38,7 +38,7 @@ module.exports = {
             let commandName = args[0].toLowerCase();
             // if argument is not a command, provide error
             if (!commands.has(commandName)) {
-                reply(client, interaction, `${commandName} is not an available argument`);
+                reply(interaction, `${commandName} is not an available argument`);
                 return;
             }
             // if argument is a command, provide description of it
@@ -48,7 +48,7 @@ module.exports = {
                 if (command.admin && !(interaction.member.permissions & 1<<3 === 1<<3)) return; // if admin command and is user, dont print
                 // if (command.admin && !interaction.member.hasPermission('ADMINISTRATOR')) return; // if admin command and is user, dont print
                 let description_string = `\`${prefix}${command.name}${command.usage ? ' ' + command.usage : ''}\`: ${command.description}`;
-                reply(client, interaction, description_string);
+                reply(interaction, description_string);
             }
         }
 
@@ -97,8 +97,8 @@ module.exports = {
                 }
 
                 // send the message 
-                reply(client, interaction, 'sorry embed messages are not supported yet');
-                // reply(client, interaction, {files: [mm_mulan], embed: commands_embed});
+                reply(interaction, 'sorry embed messages are not supported yet');
+                // reply(interaction, {files: [mm_mulan], embed: commands_embed});
             });
         }
     },

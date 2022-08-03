@@ -24,7 +24,7 @@ module.exports = {
                 command.execute(message, args, client); // run command with args and database reference
             } catch (error) { // if there's an error, print it as well as a message in the chat
                 console.error(error);
-                message.reply(client, interaction, 'there was an error trying to execute this command :/');
+                message.reply('there was an error trying to execute this command :/');
             }
         }
 	},

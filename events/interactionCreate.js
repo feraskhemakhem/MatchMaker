@@ -1,7 +1,7 @@
 // module for interaction event of client
 // this function gets called when interacting with user, which should be with every command (slash commands)
 
-const { reply } = require('../helper_functions/event_helper.js');
+const { reply } = require('../helper_functions/comm_helper.js');
 
 module.exports = {
         // update for v14: no longer need to use API to run slash commands
@@ -21,8 +21,7 @@ module.exports = {
                 if (!command.public && interaction.member.id !== client.my_maker.id) return; // if not public and I (owner) don't ask for it, ignore
 
                 // print interaction information
-                console.log(`interaction: ${interaction}`);
-                console.log(`\n\n`);
+                console.log(`interactionCreate: ${interaction}\n`);
 
                 // get cooldowns to get ensure this command is not on cooldown
                 const { cooldowns, default_cooldown } = client;
@@ -32,17 +31,6 @@ module.exports = {
 
                 // if admin command and you aren't an admin, get out of here!
                 if (command.admin && !interaction.memberPermissions.has('ADMINISTRATOR')) return;
-
-                // she's a beaut: https://discordjs.guide/command-handling/adding-features.html#expected-command-usage
-                // if incorrectly formatted, send strongly worded message
-                if (command.args && command.args !== args.length) {
-                        let reply = `Error: incorrect number of arguments provided`;
-
-                        if (command.usage) {
-                                reply += `\nPlease follow the format: ${client.prefix}${command.name} ${command.usage}`;
-                        }
-                        return (client, interaction, reply);
-                }
 
                 // check for appropriate cooldowns
                 const now = Date.now();
@@ -57,7 +45,7 @@ module.exports = {
                         // if the cooldown is still going, tell them to waits
                         if (now < expirationTime) {
                                 const timeLeft = (expirationTime - now) / 1000;
-                                return reply(client, interaction, `please do not spam me; I'm a busy woman. The cooldown for the ${command.name} is ${cooldownAmount / 1000} seconds.`);
+                                return reply(interaction, `please do not spam me; I'm a busy woman. The cooldown for the ${command.name} is ${cooldownAmount / 1000} seconds.`);
                         }
                 }
 
@@ -71,7 +59,7 @@ module.exports = {
                         command.execute(interaction, client); // run command
                 } catch (error) { // if there's an error, print it as well as a message in the chat
                         console.error(error);
-                        reply(client, interaction, 'there was an error trying to execute this command :/');
+                        reply(interaction, 'there was an error trying to execute this command :/');
                 }
 
 	},

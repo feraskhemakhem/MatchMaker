@@ -112,6 +112,7 @@ module.exports = {
 
                 if (!command.public || command.admin) return; // if not for all users, hide
 
+                // only take first 100 characters of description
                 let functional_desc = command.description;
                 if (command.description.length < 1 || command.description.length > 100) {
                     functional_desc = command.description.substring(0, command.description.indexOf('.'));

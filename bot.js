@@ -1,6 +1,6 @@
 // IDEAs:  - add functionality to read names from a discord voice chat instead of waiting for reactions
 //         - add option to move people to given channels (automatically move to Val and Val2)
-//         - make setting elo reaction-based
+//         - make setting elo reaction-based and command-based
 
 // For v3.0:
 // - (DONE) Make code more efficient / argument based
@@ -10,9 +10,10 @@
 // - (DONE) If deploy/reload has no args, use last used command name
 // - (DONE) Make database readings within the function instead of outside function
 // - Convert ALL functions with args into using the options property of the interaction
-// - Revisit "followUp" function in event_helper.js
+// - Revisit "followUp" function in comm_helper.js
 // - Revisit embed functionality in reply function
 // - Investigate database options that are non-local
+// - Look into the value of editing a message for new match over creating 2 (edit "Making teams..." to add complete plus embed)
 
 // Potentially for v3.0:
 // - Add option for teams to be totally random instead of rank-based (e.g. '-unranked')
@@ -20,14 +21,19 @@
 // - Update readme to include information of what files are what
 // - (DONE) Add interaction optimization
 // - Add permissions for setup function
-// - Add preprocessor code for readme to make version and command details automatic
 // - Add oppourtunity for automatic registration of players from a voice channel (e.g. '-vc')
 
 // v4.0:
 // - Revisit the need for a commands collection, as commands are stored on discord when deploying them
 // - Investigate whether patching commands is better than deleting then adding the same commands
 // - (DONE for v3.0) WHENEVER IT COMES OUT, UPDATE INTERACTIONS TO WORK WITH DISCORDJS INSTEAD OF USING REST API
-// - Change readData() to only pull single entry instead of all entries (optimization)
+// - Change relevant db functions to only pull needed entries, instead of all entries (optimization)
+// - Explore a command to change the match cooldown (or extra parameter maybe)
+
+// Potentially for v4.0:
+// - Add preprocessor code for readme to make version and command details automatic
+// - Add chalk package to clean up console logs
+// - Look into pino to replace console logs (https://discordjs.guide/miscellaneous/useful-packages.html#pino)
 
 
 /********************************* CONSTS *********************************/
