@@ -3,14 +3,12 @@
 
 // self-defined helper functions
 const { ApplicationCommandOptionType } = require('discord.js');
-const { readData, updateCachedPlayers, getScore } = require('../../helper_functions/db_helper.js');
-const { reply, reply_and_react } = require('../../helper_functions/comm_helper.js');
-const { makeTeams } = require('../../helper_functions/helper.js');
+const { reply_and_react } = require('../../helper_functions/comm_helper.js');
 const { matchMaker } = require('../../helper_functions/match_helper.js');
 
 // global consts needed for this function
 const confirm_reaction = '✅'; // reaction to confirm
-const collection_time = 30; // in seconds
+const collection_time = 3; // in seconds
 
 // actual module
 module.exports = {
@@ -37,9 +35,9 @@ module.exports = {
 
 
         // extract number of players
-        const num_players = interaction.options.getInteger("num players");
+        const num_players = interaction.options.getInteger('num_players');
 
-        console.log(`match: sending reaction prompt/reply...`);
+        console.log(`match: sending reaction prompt/reply for ${num_players} players...`);
 
         // very error prone, so using try/catch in case
         try {
@@ -56,7 +54,7 @@ module.exports = {
             // structure inspired by https://stackoverflow.com/questions/50058056/how-to-use-awaitreactions-in-guildmemberadd
             // await ensures that we don't return before reactions complete
             // wait collected_time seconds (*1000 for ms->s) for num_players+1 (+1 for bot) reactions, for only 1 possible emoji
-            repl.awaitReactions({filter, max: num_players+1, time: collection_time*1000, errors: ['time']})
+            repl.awaitReactions({filter, max: num_players+1, time: 3_000, errors: ['time']})
                 .then(collected => {
                    
                     matchMaker(interaction, collected);

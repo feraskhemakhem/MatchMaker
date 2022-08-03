@@ -17,10 +17,11 @@ This patch's focus is on the abstraction of the match command's functionality in
 
 - Reverted num_players variable to extract from integer option (was hardcoded for debugging :skull:) [match.js]
 - Embed now includes the requestor's name to be more specific [helper.js]
+- Fixed bug with retrieving number of players in match commands [match.js]
  
 ### Removed
 
-(nothing)
+- Deleted unnecessary requires [match.js, match_helper.js]
 
 
 ## [2.6.5] - 2022-08-02

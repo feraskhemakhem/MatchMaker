@@ -4,8 +4,7 @@
 /****************************** CONSTS ******************************/
 
 // self-defined helper functions
-const { readData, updateCachedPlayers, getScore } = require('./db_helper.js');
-const { reply, reply_and_react } = require('./comm_helper.js');
+const { getScore } = require('./db_helper.js');
 const helper = require('./helper.js');
 
 
@@ -32,10 +31,10 @@ module.exports = {
         console.log(`matchMaker: initial lists are ${users_coll.toJSON()} and ${ids_arr}`);
 
         // if bot id is in the lists, remove from both (assumes order is the same in both lists)
-        // let bot_id;
-        // if ((bot_id = ids_arr.indexOf(interaction.client.user.id)) !== -1) {
-        //     ids_arr.splice(bot_id, 1);
-        // }
+        let bot_id;
+        if ((bot_id = ids_arr.indexOf(interaction.client.user.id)) !== -1) {
+            ids_arr.splice(bot_id, 1);
+        }
 
         console.log(`matchMaker: final lists are ${users_coll.toJSON()} and ${ids_arr}`);
 
