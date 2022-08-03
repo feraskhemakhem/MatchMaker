@@ -168,7 +168,7 @@ module.exports = {
     // parameters: channel reference for sending
     // prints: teamsi in embed message
     // returns: N/A
-    printTeams: async function(t1_string, t2_string, team_ad_string, channel) {
+    printTeams: async function(user_requesting, t1_string, t2_string, team_ad_string, channel) {
         team_ad_string = team_ad_string + '\n\u200B';
         // print teams in an embedded message
         // https://stackoverflow.com/questions/49334420/discord-js-embedded-message-multiple-line-value
@@ -176,7 +176,7 @@ module.exports = {
 
         teams_embed
         .setFooter({ text: puns[Math.floor(Math.random() * puns.length)] })  // add a little pun at the bottom
-        .setTitle('Match Made!')
+        .setTitle(`${user_requesting}'s Match is Made!`)
         .addFields(
             {name: 'Team 1', value: `${t1_string}`, inline: true},
             {name: '\u200B', value: '\u200B', inline: true},
@@ -401,7 +401,7 @@ module.exports = {
         });
 
         // print results
-        this.printTeams(t1_string, t2_string, team_ad_string, interaction.channel);
+        this.printTeams(interaction.user.username, t1_string, t2_string, team_ad_string, interaction.channel);
 
         return true; // if you've made it this far, you're either really sneaky or just a valid entry
     },

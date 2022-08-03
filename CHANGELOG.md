@@ -4,7 +4,26 @@ All notable changes to this project will be documented in this file.
  
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [2.6.5] - 2022-8-2
+## [2.6.6] - 2022-08-02
+
+This patch's focus is on the abstraction of the match command's functionality into a helper function named matchMaker.
+
+### Added
+
+- matchMaker() added to new file, match_helper.js. The functionality is abstracted from the match.js file to easily share functionality with other functions [match.js, match_helper.js]
+- Allowed time to react added to prints [match.js]
+ 
+### Changed
+
+- Reverted num_players variable to extract from integer option (was hardcoded for debugging :skull:) [match.js]
+- Embed now includes the requestor's name to be more specific [helper.js]
+ 
+### Removed
+
+(nothing)
+
+
+## [2.6.5] - 2022-08-02
 
 This patch's focus is the match command, in match.js.
 
@@ -37,7 +56,8 @@ This patch's focus is the match command, in match.js.
 - Manual range checks for num_players removed [match.js]
 - Updating of cached players (updateCachedPlayers) no longer necessary in match.js as we now pass all relevant cached players into makeTeams [match.js]
 
-## [2.6.4] - 2022-7-24
+
+## [2.6.4] - 2022-07-24
  
 With a crusade to update all slash functionality, the elo command is the focus of v2.6.4. In this update we see elo.js updated to work with the interaction class, and some database functionality is shuffled around.
 
@@ -54,8 +74,10 @@ With a crusade to update all slash functionality, the elo command is the focus o
  
 ### Removed
 
+(nothing)
+
  
-## [2.6.3] - 2022-7-22
+## [2.6.3] - 2022-07-22
  
 This update exists as the first revisit of the codebase in over a year. With a fresh set of eyes, things are slowly being cleaned up and functionality of slash commands is taken with a fresh approach. discord.js v14 is introduced in this updated with v10 of the discord API, and most of the work in this iteration is to get the code up to speed to ensure it works with discord.js v14.
 
@@ -79,3 +101,5 @@ This update exists as the first revisit of the codebase in over a year. With a f
 - reply function got a huge facelift to become essentially a 2-line function with the introduction of interactions in v14 [event_helper.js]
  
 ### Removed
+
+(nothing)

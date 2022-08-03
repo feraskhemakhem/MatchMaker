@@ -45,7 +45,7 @@ module.exports = {
                         // if the cooldown is still going, tell them to waits
                         if (now < expirationTime) {
                                 const timeLeft = (expirationTime - now) / 1000;
-                                return reply(interaction, `please do not spam me; I'm a busy woman. The cooldown for the ${command.name} is ${cooldownAmount / 1000} seconds.`);
+                                return reply(interaction, `please do not spam me; I'm a busy woman. The cooldown for the ${client.prefix}${command.name} is ${cooldownAmount / 1000} seconds.`);
                         }
                 }
 

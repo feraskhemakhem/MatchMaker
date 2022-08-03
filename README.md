@@ -1,10 +1,10 @@
-# MatchMaker v2.6.5
+# MatchMaker v2.6.6
 
 A discord bot that creates balanced teams for team-based video games.
 
 ### New In This Patch
 
-In our continued attempt to update our commands to discord.js v14, the match command gets fixed in v2.6.5. A more precise and foolproof implementation comes out of this patch with the use of the interaction class. In addition, the formatting of `CHANGELOG.md` is modified to better fit the scope of this function ("Fixed" --> "Removed", since "Fixed" and "Changes" have a large amount of overlap) and functions for created embeds are updated for v14.
+v2.6.6 exists to abstract of the match command's functionality into a helper function named matchMaker. The reasoning is so that the match command is not the only command with the power to make matches, and now functionality can be shared with other commands as necessary in the future.
 
 Full details in `CHANGELOG.md`.
 
